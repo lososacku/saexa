@@ -28,7 +28,7 @@ poll :- write('...polling...'),
         nl,
 %        write(PostLinesResponse),
         nl,
-        process_prolog_actions(PostLinesResponse),
+        ignore(process_prolog_actions(PostLinesResponse)),
         sleep(3),
         poll.
 
