@@ -1,0 +1,50 @@
+
+.incident {
+    position: relative;
+    margin: 10%;
+    width: 25%;
+    border-style: solid;
+    border-color: #EC6807;
+    border-width: thick;
+}
+
+.title {
+    background: #E2DCD9;
+    width: 100%;
+}
+
+.type {
+    background: #F5C035;
+    width: 100%;
+}
+
+.incident_posted_data_item tr:nth-child(2n+1) {
+    background: #A39EB9;
+}
+
+.incident_posted_data_item tr:nth-child(2n+2) {
+    background: #C9BAB7;
+}
+
+.description {
+
+    background: #C3CCC7;
+}
+
+.post_counts {
+
+    background: #A39EB9;
+}
+
+
+.names {
+
+    background: #C9BAB7;
+}
+
+.personal {
+
+    background: #C9BAB7;
+}
+
+

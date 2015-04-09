@@ -1,0 +1,25 @@
+{
+  "packages": {
+    "twitter-api": {},
+    "facebook-procurer": {
+      "path": "packages/facebook-procurer"
+    },
+    "procurer-base": {
+      "path": "packages/procurer-base"
+    },
+    "twitter-procurer": {
+      "path": "packages/twitter-procurer"
+    },
+    "tumblr-procurer": {
+      "path": "packages/tumblr-procurer"
+    },
+    "youtube-procurer": {
+      "path": "packages/youtube-procurer"
+    },
+    },
+    "instagram-procurer": {
+      "path": "packages/instagram-procurer"
+    },
+    "crypto-base64": {}
+  }
+}

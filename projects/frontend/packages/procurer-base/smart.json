@@ -1,0 +1,7 @@
+{
+  "name": "procurer",
+  "description": "Base Procurer for Exposure Analysis",
+  "version": "0.8",
+  "packages": {
+  }
+}

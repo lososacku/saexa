@@ -1,0 +1,1740 @@
+:- import append/3 from basics.
+:- import ith/3 from basics.
+:- dynamic(token_type/2).
+:- dynamic(user_item/5).
+
+:- consult('../prolog-curl/host').
+:- consult('../prolog-curl/pcurl').
+:- import put_nlp_results/1, get_uuid/1 from pcurl.
+
+-----------------------------------------------------------------
+
+:- export url_format_test_00/2,
+          url_format_test_01/3,
+          url_format_test_02/3,
+          url_format_test_03/3,
+          tei_test_00/2,
+          tei_test_01/5,
+          test00,
+          ts0/1,
+          ts1/1,
+          ts2/1,
+          ts3/1,
+          ts4/1,
+          ts5/1,
+          ts6/1,
+          ts7/1,
+          ti0/0,
+          ti1/0,
+          ti2/0,
+          xti/0,
+          kt0/0,
+          kt1/0,
+          kt2/0,
+          kt3/0,
+          xt0/0,
+          make_nlp_classification/2,
+          tld/3,
+          scheme_name/3,
+          colon_slash_slash/3,
+          url_path/3,
+          url/3,
+          email_address/3,
+          to_lower/2,
+          char_type/2,
+          digit/3,
+          control_code/3,
+          letter/3,
+          punctuation/3,
+          space/3,
+          word_character/3,
+          spaces/3,
+          any_token/2,
+          word/3,
+          punctuation_string/3,
+          token/3,
+          tokenize_string/3,
+          add_token_type/2,
+          purge_token_types/0,
+          flatten_tokens/2,
+          ignore/1,
+          add_user_item/3,
+          nlp_result/5,
+          facebook_location_found/3,
+          education_found/3,
+          school_found/3,
+          email_address_found/3,
+          profile_login_name_found/3,
+          profile_user_id_found/3,
+          profile_display_name_found/3,
+          youtube_video_id_found/3,
+          youtube_video_title_found/3,
+          catalogued_constituent_found/3,
+          post_contains_url/3,
+          post_contains_email_address/3,
+          high_school_found/3,
+          home_town_found/3.
+
+%% :- local  make_nlp_classification/2,
+%%           tld/3,
+%%           scheme_name/3,
+%%           colon_slash_slash/3,
+%%           url_path/3,
+%%           url/3,
+%%           email_address/3,
+%%           to_lower/2,
+%%           char_type/2,
+%%           digit/3,
+%%           control_code/3,
+%%           letter/3,
+%%           punctuation/3,
+%%           space/3,
+%%           word_character/3,
+%%           spaces/3,
+%%           any_token/2,
+%%           word/3,
+%%           punctuation_string/3,
+%%           token/3,
+%%           tokenize_string/3,
+%%           add_token_type/2,
+%%           purge_token_types/0,
+%%           flatten_tokens/2,
+%%           ignore/1,
+%%           add_user_item/3,
+%%           nlp_result/5,
+%%           facebook_location_found/3,
+%%           education_found/3,
+%%           school_found/3,
+%%           email_address_found/3,
+%%           profile_login_name_found/3,
+%%           profile_user_id_found/3,
+%%           profile_display_name_found/3,
+%%           youtube_video_id_found/3,
+%%           youtube_video_title_found/3,
+%%           catalogued_constituent_found/3,
+%%           post_contains_url/3,
+%%           post_contains_email_address/3,
+%%           high_school_found/3,
+%%           home_town_found/3.
+
+%%-----------------------------------------------------------------
+
+:- export user_item/5,
+          token_type/2,
+          add_youtube_video_info/2,
+          add_internal_post_id/2,
+          add_catalogued_constituent/3,
+          add_facebook_user_id/1,
+          add_facebook_name_string/1,
+          add_facebook_first_name/1,
+          add_facebook_middle_name/1,
+          add_facebook_last_name/1,
+          add_facebook_profile_url/1,
+          add_facebook_user_name/1,
+          add_facebook_birthday_string/1,
+          add_facebook_email_address/1,
+          add_facebook_gender/1,
+          add_facebook_relationship_status/1,
+          add_facebook_locale/1,
+          add_facebook_timezone/1,
+          add_facebook_hometown/2,
+          add_facebook_location/2,
+          add_facebook_highschool/2,
+          add_facebook_highschool_class/2,
+          add_profile_display_name/2,
+          add_profile_login_and_display_name/3,
+          add_profile_login_name/2,
+          add_profile_user_id/2,
+          process_post/2,
+          purge_nlp_data/0.
+
+
+%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+%proxies
+%%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+%% get_uuid(Uuid) :- Uuid = "594b0afe-7a82-4bdd-8064-6e83cedcbe75".
+
+%% external_log(LogString) :- write(LogString),nl.
+
+:- dynamic(nlp_result/1).
+nlp_result('').
+:- export nlp_result/1.
+
+store_nlp_result(PostId,
+                 Classification,
+                 Taxonomy,
+                 Entity,
+                 Item)
+:-  
+    %% name(Classification_name,Classification),
+    %% name(Taxonomy_name,Taxonomy),
+    %% name(Entity_name,Entity),
+    %% name(Item_name,Item),
+    %% write('||||||||||||||'),nl,write(Item_name),nl,write(Item),nl,
+    nlp_result(CurrentClipsNlpResultStrings),
+    retract(nlp_result(_)),
+    fmt_write_string(ClipsNlpResultStrings,
+                     "%s'(clips . >{OQ}<(make-instance of NLP-CLASSIFICATION(target-uuid %s)(classification %s)(taxonomy >{IQ}<%s>{IQ}<)(entity >{IQ}<%s>{IQ}<)(item >{IQ}<%s>{IQ}<))>{OQ}<)\n",
+%                     args(CurrentClipsNlpResultStrings, PostId, Classification_name, Taxonomy_name, Entity_name, Item_name)),
+                     args(CurrentClipsNlpResultStrings, PostId, Classification, Taxonomy, Entity, Item)),
+    assert(nlp_result(ClipsNlpResultStrings)).
+
+
+%////////////////////////////////////////////////////////////////////
+% NLP API
+%////////////////////////////////////////////////////////////////////
+
+purge_nlp_data :- retractall(user_item(_,_,_,_,_)).
+
+%---------------------
+
+
+add_youtube_video_info(InfoType,InfoContent)
+:-
+%% write('add_youtube_video_info'),
+%% nl,
+tokenize_string(YTt,"youtube",_),
+tokenize_string(ITt,InfoType,_),
+tokenize_string(ICt,InfoContent,_),
+\+ user_item(YTt,ITt,ICt,_,_) -> add_user_item(YTt,ITt,ICt);true.
+
+add_catalogued_constituent(ServiceName,Cataloguing,Constituent)
+:-
+%% write('add_catalogued_constituent'),
+%% nl,
+tokenize_string(SNt,ServiceName,_),
+tokenize_string(CAt,Cataloguing,_),
+tokenize_string(COt,Constituent,_),
+\+ user_item(SNt,CAt,COt,_,_) -> add_user_item(SNt,CAt,COt);true.
+
+add_internal_post_id(ServiceName,InternalPostId)
+:-
+%% write('add_internal_post_id'),
+%% nl,
+tokenize_string(SNt,ServiceName,_),
+tokenize_string(IPI_label_t,"internal-post-id",_),
+tokenize_string(IPIt,InternalPostId,_),
+\+ user_item(SNt,IPI_label_t,IPIt,_,_) -> add_user_item(SNt,IPI_label_t,IPIt);true.
+
+add_facebook_user_id(UserId)
+:-
+%% write('add_facebook_user_id'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(UI_label_t,"user-id",_),
+tokenize_string(UIt,UserId,_),
+\+ user_item(FBt,UI_label_t,UIt,_,_) -> add_user_item(FBt,UI_label_t,UIt);true,
+add_profile_login_name("facebook",UserId).
+
+add_facebook_name_string(NameString)
+:-
+%% write('add_facebook_name_string'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(NS_label_t,"name-string",_),
+tokenize_string(NSt,NameString,_),
+\+ user_item(FBt,NS_label_t,NSt,_,_) -> add_user_item(FBt,NS_label_t,NSt);true,
+add_profile_login_name("facebook",NameString).
+
+add_facebook_first_name(FirstName)
+:-
+%% write('add_facebook_first_name'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(FN_label_t,"first-name",_),
+tokenize_string(FNt,FirstName,_),
+\+ user_item(FBt,FN_label_t,FNt,_,_) -> add_user_item(FBt,FN_label_t,FNt);true.
+
+add_facebook_middle_name(MiddleName)
+:-
+%% write('add_facebook_middle_name'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(MN_label_t,"middle-name",_),
+tokenize_string(MNt,MiddleName,_),
+\+ user_item(FBt,MN_label_t,MNt,_,_) -> add_user_item(FBt,MN_label_t,MNt);true.
+
+add_facebook_last_name(LastName)
+:-
+%% write('add_facebook_last_name'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(LN_label_t,"last-name",_),
+tokenize_string(LNt,LastName,_),
+\+ user_item(FBt,LN_label_t,LNt,_,_) -> add_user_item(FBt,LN_label_t,LNt);true.
+
+add_facebook_profile_url(ProfileUrl)
+:-
+%% write('add_facebook_profile_url'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(PU_label_t,"profile-url",_),
+tokenize_string(PUt,ProfileUrl,_),
+\+ user_item(FBt,PU_label_t,PUt,_,_) -> add_user_item(FBt,PU_label_t,PUt);true.
+
+add_facebook_user_name(UserName)
+:-
+%% write('add_facebook_user_name'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(UN_label_t,"user-name",_),
+tokenize_string(UNt,UserName,_),
+\+ user_item(FBt,UN_label_t,UNt,_,_) -> add_user_item(FBt,UN_label_t,UNt);true,
+add_profile_login_name("facebook",UserName).
+
+add_facebook_birthday_string(BirthdayString)
+:-
+%% write('add_facebook_birthday_string'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(BS_label_t,"birthday-string",_),
+tokenize_string(BSt,BirthdayString,_),
+\+ user_item(FBt,BS_label_t,BSt,_,_) -> add_user_item(FBt,BS_label_t,BSt);true.
+
+add_facebook_email_address(EmailAddress)
+:-
+%% write('add_facebook_email_address'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(EA_label_t,"email-address",_),
+tokenize_string(EAt,EmailAddress,_),
+\+ user_item(FBt,EA_label_t,EAt,_,_) -> add_user_item(FBt,EA_label_t,EAt);true.
+
+add_facebook_gender(Gender)
+:-
+%% write('add_facebook_gender'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(G_label_t,"gender",_),
+tokenize_string(Gt,Gender,_),
+\+ user_item(FBt,G_label_t,Gt,_,_) -> add_user_item(FBt,G_label_t,Gt);true.
+
+add_facebook_relationship_status(RelationshipStatus)
+:-
+%% write('add_facebook_relationship_status'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(RS_label_t,"relationship-status",_),
+tokenize_string(RSt,RelationshipStatus,_),
+\+ user_item(FBt,RS_label_t,RSt,_,_) -> add_user_item(FBt,RS_label_t,RSt);true.
+
+add_facebook_locale(Locale)
+:-
+%% write('add_facebook_locale'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(L_label_t,"locale",_),
+tokenize_string(Lt,Locale,_),
+\+ user_item(FBt,L_label_t,Lt,_,_) -> add_user_item(FBt,L_label_t,Lt);true.
+
+add_facebook_timezone(Timezone)
+:-
+%% write('add_facebook_timezone'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(TZ_label_t,"timezone",_),
+tokenize_string(TZt,Timezone,_),
+\+ user_item(FBt,TZ_label_t,TZt,_,_) -> add_user_item(FBt,TZ_label_t,TZt);true.
+
+add_facebook_hometown(Hometown,Id)
+:-
+%% write('add_facebook_hometown'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(HT_label_t,"hometown",_),
+tokenize_string(I_label_t,"hometown-id",_),
+tokenize_string(HTt,Hometown,_),
+tokenize_string(It,Id,_),
+\+ user_item(FBt,HT_label_t,HTt,_,_) -> add_user_item(FBt,HT_label_t,HTt);true,
+\+ user_item(FBt,I_label_t,It,_,_) -> add_user_item(FBt,I_label_t,It);true.
+
+add_facebook_location(Location,Id)
+:-
+%% write('add_facebook_location'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(L_label_t,"location",_),
+tokenize_string(I_label_t,"location-id",_),
+tokenize_string(Lt,Location,_),
+tokenize_string(It,Id,_),
+\+ user_item(FBt,L_label_t,Lt,_,_) -> add_user_item(FBt,L_label_t,Lt);true,
+\+ user_item(FBt,I_label_t,It,_,_) -> add_user_item(FBt,I_label_t,It);true.
+
+add_facebook_highschool(Highschool,Id)
+:-
+%% write('add_facebook_highschool'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(HS_label_t,"highschool",_),
+tokenize_string(I_label_t,"highschool-id",_),
+tokenize_string(HSt,Highschool,_),
+tokenize_string(It,Id,_),
+\+ user_item(FBt,HS_label_t,HSt,_,_) -> add_user_item(FBt,HS_label_t,HSt);true,
+\+ user_item(FBt,I_label_t,It,_,_) -> add_user_item(FBt,I_label_t,It);true.
+
+add_facebook_highschool_class(HighschoolClass,Id)
+:-
+%% write('add_facebook_highschool_class'),
+%% nl,
+tokenize_string(FBt,"facebook",_),
+tokenize_string(HSC_label_t,"highschool-class",_),
+tokenize_string(I_label_t,"highschool-class-id",_),
+tokenize_string(HSCt,HighschoolClass,_),
+tokenize_string(It,Id,_),
+\+ user_item(FBt,HSC_label_t,HSCt,_,_) -> add_user_item(FBt,HSC_label_t,HSCt);true,
+\+ user_item(FBt,I_label_t,It,_,_) -> add_user_item(FBt,I_label_t,It);true.
+
+add_profile_display_name(ServiceName,DisplayName)
+:-
+%% write('add_profile_display_name'),
+%% nl,
+tokenize_string(SNt,ServiceName,_),
+tokenize_string(DN_label_t,"display-name",_),
+tokenize_string(DNt,DisplayName,_),
+\+ user_item(SNt,DN_label_t,DNt,_,_) -> add_user_item(SNt,DN_label_t,DNt);true.
+
+add_profile_login_and_display_name(ServiceName,LoginName,DisplayName)
+:-
+%% write('add_profile_login_and_display_name'),
+%% nl,
+tokenize_string(SNt,ServiceName,_),
+tokenize_string(LN_label_t,"login-name",_),
+tokenize_string(DN_label_t,"display-name",_),
+tokenize_string(LNt,LoginName,_),
+tokenize_string(DNt,DisplayName,_),
+\+ user_item(SNt,LN_label_t,LNt,_,_) -> add_user_item(SNt,LN_label_t,LNt);true,
+\+ user_item(SNt,DN_label_t,DNt,_,_) -> add_user_item(SNt,DN_label_t,DNt);true.
+
+add_profile_login_name(ServiceName,LoginName)
+:-
+%% write('add_profile_login_name'),
+%% nl,
+tokenize_string(SNt,ServiceName,_),
+tokenize_string(LN_label_t,"login-name",_),
+tokenize_string(LNt,LoginName,_),
+\+ user_item(SNt,LN_label_t,LNt,_,_) -> add_user_item(SNt,LN_label_t,LNt);true.
+
+add_profile_user_id(ServiceName,UserId)
+:-
+%% write('add_profile_user_id'),
+%% nl,
+tokenize_string(SNt,ServiceName,_),
+tokenize_string(UI_label_t,"user-id",_),
+tokenize_string(UIt,UserId,_),
+\+ user_item(SNt,UI_label_t,UIt,_,_) -> add_user_item(SNt,UI_label_t,UIt);true.
+
+
+
+process_post(Id,ExposureString)
+:-
+%% write('process_post'),
+%% nl,
+%% write(Id),
+%% nl,
+%% write(ExposureString),
+%% nl,
+tokenize_string(ESt,ExposureString,_),
+%% write(ESt),
+%% nl,
+make_nlp_classification(Id,ESt),
+purge_token_types.
+
+
+make_nlp_classification(PostId,PostTokens)
+:-
+
+ignore(school_found(PostId,PostTokens,_)),
+ignore(education_found(PostId,PostTokens,_)),
+ignore(facebook_location_found(PostId,PostTokens,_)),
+ignore(email_address_found(PostId,PostTokens,_)),
+ignore(profile_login_name_found(PostId,PostTokens,_)),
+ignore(profile_user_id_found(PostId,PostTokens,_)),
+ignore(profile_display_name_found(PostId,PostTokens,_)),
+ignore(youtube_video_id_found(PostId,PostTokens,_)),
+ignore(youtube_video_title_found(PostId,PostTokens,_)),
+ignore(high_school_found(PostId,PostTokens,_)),
+ignore(home_town_found(PostId,PostTokens,_)),
+ignore(first_name_found(PostId,PostTokens,_)),
+ignore(middle_name_found(PostId,PostTokens,_)),
+ignore(last_name_found(PostId,PostTokens,_)),
+ignore(catalogued_constituent_found(PostId,PostTokens,_)),
+ignore(post_contains_url(PostId,PostTokens,_)),
+ignore(post_contains_email_address(PostId,PostTokens,_)).
+
+
+
+
+zorg(X, Y) :- write(X), nl, write(Y), nl.
+
+:- export zorg/2.
+
+
+%////////////////////////////////////////////////////////////////////
+%% main NLP logic
+%////////////////////////////////////////////////////////////////////
+
+school_found(PostId)
+-->
+{tokenize_string(School,"school",_)},!,
+any_token,
+user_item(Taxonomy,School,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "school-found",
+            Taxonomy,
+            School,
+            Item)}.
+
+education_found(PostId)
+-->
+{tokenize_string(Education,"education",_)},!,
+any_token,
+user_item(Taxonomy,Education,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "education-found",
+            Taxonomy,
+            Education,
+            Item)}.
+
+facebook_location_found(PostId)
+-->
+{tokenize_string(Location,"location",_)},!,
+any_token,
+user_item(Taxonomy,Location,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "location-found",
+            Taxonomy,
+            Location,
+            Item)}.
+
+email_address_found(PostId)
+-->
+{tokenize_string(EmailAddress,"email-address",_)},!,
+any_token,
+user_item(Taxonomy,EmailAddress,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "email-address-found",
+            Taxonomy,
+            EmailAddress,
+            Item)}.
+
+profile_login_name_found(PostId)
+-->
+{tokenize_string(LoginName,"login-name",_)},!,
+any_token,
+user_item(Taxonomy,LoginName,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "login-name-found",
+            Taxonomy,
+            LoginName,
+            Item)}.
+
+profile_user_id_found(PostId)
+-->
+{tokenize_string(UserId,"user-id",_)},!,
+any_token,
+user_item(Taxonomy,UserId,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "profile-user-id-found",
+            Taxonomy,
+            UserId,
+            Item)}.
+profile_display_name_found(PostId)
+-->
+{tokenize_string(DisplayName,"display-name",_)},!,
+any_token,
+user_item(Taxonomy,DisplayName,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "profile-display-name-found",
+            Taxonomy,
+            DisplayName,
+            Item)}.
+
+youtube_video_id_found(PostId)
+-->
+{tokenize_string(VideoId,"youtube-video-id",_)},!,
+any_token,
+user_item(Taxonomy,VideoId,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "youtube-video-id-found",
+            Taxonomy,
+            VideoId,
+            Item)}.
+
+youtube_video_title_found(PostId)
+-->
+{tokenize_string(VideoTitle,"youtube-video-title",_)},!,
+any_token,
+user_item(Taxonomy,VideoTitle,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "youtube-video-title-found",
+            Taxonomy,
+            VideoTitle,
+            Item)}.
+
+high_school_found(PostId)
+-->
+{tokenize_string(HighSchool,"highschool",_)},!,
+any_token,
+user_item(Taxonomy,HighSchool,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "high-school-found",
+            Taxonomy,
+            HighSchool,
+            Item)}.
+
+home_town_found(PostId)
+-->
+{tokenize_string(HomeTown,"hometown",_)},!,
+any_token,
+user_item(Taxonomy,HomeTown,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "hometown-found",
+            Taxonomy,
+            HomeTown,
+            Item)}.
+
+first_name_found(PostId)
+-->
+{tokenize_string(FirstName,"first-name",_)},!,
+any_token,
+user_item(Taxonomy,FirstName,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "first-name-found",
+            Taxonomy,
+            FirstName,
+            Item)}.
+
+middle_name_found(PostId)
+-->
+{tokenize_string(MiddleName,"middle-name",_)},!,
+any_token,
+user_item(Taxonomy,MiddleName,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "middle-name-found",
+            Taxonomy,
+            MiddleName,
+            Item)}.
+
+last_name_found(PostId)
+-->
+{tokenize_string(LastName,"last-name",_)},!,
+any_token,
+user_item(Taxonomy,LastName,Item),!,
+any_token,!,
+{nlp_result(PostId,
+            "last-name-found",
+            Taxonomy,
+            LastName,
+            Item)}.
+
+%---------------------------------------------------
+
+catalogued_constituent_found(PostId)
+-->
+{tokenize_string(LoginName,"login-name",_),
+ tokenize_string(UserId,"user-id",_),
+ tokenize_string(Location,"location",_),
+ tokenize_string(Education,"education",_),
+ tokenize_string(School,"school",_),
+ tokenize_string(Highschool,"highschool",_),
+ tokenize_string(EmailAddress,"email-address",_),
+ tokenize_string(DisplayName,"display-name",_),
+ tokenize_string(YoutubeVideoId,"youtube-video-id",_),
+ tokenize_string(YoutubeVideoTitle,"youtube-video-title",_),
+ tokenize_string(YoutubeVideoInfo,"youtube-video-info",_),     % this needs to be looked at, this entity comes from outside
+ tokenize_string(Hometown,"hometown",_),
+ tokenize_string(FirstName,"first-name",_),
+ tokenize_string(MiddleName,"middle-name",_),
+ tokenize_string(LastName,"last-name",_)},!,
+any_token,
+user_item(Taxonomy,Entity,Item),
+{\+ Entity=LoginName,
+ \+ Entity=UserId,
+ \+ Entity=Location,
+ \+ Entity=Education,
+ \+ Entity=Highschool,
+ \+ Entity=School,
+ \+ Entity=EmailAddress,
+ \+ Entity=DisplayName,
+ \+ Entity=YoutubeVideoId,
+ \+ Entity=YoutubeVideoTitle,
+ \+ Entity=YoutubeVideoInfo,
+ \+ Entity=Hometown,
+ \+ Entity=FirstName,
+ \+ Entity=MiddleName,
+ \+ Entity=LastName},!,
+any_token,!,
+{nlp_result(PostId,
+            "catalogued-constituent-found",
+            Taxonomy,
+            Entity,
+            Item)}.
+
+%---------------------------------------------------
+
+post_contains_url(PostId)
+-->
+{tokenize_string(Heuristic,"heuristic",_),
+ tokenize_string(Url,"url",_)},!,
+any_token,
+url(U),!,
+any_token,!,
+{nlp_result(PostId,
+            "url-found",
+            Heuristic,
+            Url,
+            U)}.
+
+post_contains_email_address(PostId)
+-->
+{tokenize_string(Heuristic,"heuristic",_),
+ tokenize_string(EmailAddress,"email-address",_)},!,
+any_token,
+email_address(EA),!,
+any_token,!,
+{nlp_result(PostId,
+            "email-address-found",
+            Heuristic,
+            EmailAddress,
+            EA)}.
+
+
+
+% /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+% tests
+% /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+url_format_test_00 --> url(_).
+url_format_test_01(X) --> url(X).
+url_format_test_02(X) --> any_token, url(X).
+url_format_test_03(X) --> any_token, url(X), any_token.
+
+tei_test_00
+-->
+user_item(Taxonomy,Entity,Item),
+{write(Taxonomy),nl,write(Entity),nl,write(Item)}.
+
+tei_test_01(Taxonomy,Entity,Item)
+-->
+user_item(Taxonomy,Entity,Item),
+{write(Taxonomy),nl,write(Entity),nl,write(Item)}.
+
+
+ts0("http://wackadoo.org/ack/oop/zorg.html").
+ts1("ack http://wackadoo.org/ack/oop/zorg.html").
+ts2("ack http://wackadoo.org/ack/oop/zorg.html oop").
+ts3("kaitiej").
+ts4("my handle there is kaitiej").
+ts5("http://www.facebook.com/kaitlyn.somersby").
+ts6("kaitlyn@saexa.com").
+ts7("http://t.co/1pTJCuYg").
+
+
+
+
+%%%%%%%%%%%%%
+
+test00 :- add_profile_login_name("formspring","kaitiejs"),
+          process_post("CCE0FC27-DCD2-4E08-BB3F-8020EECD63CC","kaitiejs").
+
+%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% english grimoire
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% contraction(Keyword)                                   --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> second_person_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> second_person_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> second_person_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> second_person_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_plural_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+%% contraction(Keyword)                                   --> third_person_singular_contracted_pronoun_verb(Keyword).
+
+%% first_person_contraction(Keyword)                      --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_singular_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_plural_contracted_pronoun_verb(Keyword).
+%% first_person_contraction(Keyword)                      --> first_person_plural_contracted_pronoun_verb(Keyword).
+
+%% family_member_noun(Keyword)                            --> grandfather_noun(Keyword).
+%% family_member_noun(Keyword)                            --> grandmother_noun(Keyword).
+%% family_member_noun(Keyword)                            --> father_noun(Keyword).
+%% family_member_noun(Keyword)                            --> mother_noun(Keyword).
+%% family_member_noun(Keyword)                            --> brother_noun(Keyword).
+%% family_member_noun(Keyword)                            --> sister_noun(Keyword).
+%% family_member_noun(Keyword)                            --> cousin_noun(Keyword).
+%% family_member_noun(Keyword)                            --> aunt_noun(Keyword).
+%% family_member_noun(Keyword)                            --> uncle_noun(Keyword).
+
+%% personal_pronoun_phrase(Keyword)                       --> personal_pronoun(Keyword).
+%% frequency_phrase(Keyword)                              --> frequency(Keyword).
+%% frequency_phrase(Keyword)                              --> frequency(Keyword), time(Keyword).
+%% frequency_phrase(Keyword)                              --> time(Keyword), frequency(Keyword).
+%% exposure_verb_phrase(Keyword)                          --> exposure_verb(Keyword).
+%% exposure_verb_phrase(Keyword)                          --> frequency_phrase(Keyword), exposure_verb(Keyword).
+%% exposure_verb_phrase(Keyword)                          --> exposure_verb(Keyword), frequency_phrase(Keyword).
+%% exposure_verb_phrase(Keyword)                          --> frequency_phrase(Keyword),
+%%                                                            exposure_verb(Keyword),
+%%                                                            frequency_phrase(Keyword).
+%% time_phrase(Keyword)                                   --> time(Keyword).
+
+%% first_person_possessive_phrase                         --> personal_pronoun_phrase(U00),possessive_verb(U01).
+%% first_person_possessive_phrase                         --> first_person_contraction(U00),possessive_verb(U01).
+
+%% competition_verb(Keyword)                              --> [win],{Keyword              = [win]}.
+%% competition_verb(Keyword)                              --> [play],{Keyword             = [play]}.
+%% competition_verb(Keyword)                              --> [vs],{Keyword               = [vs]}.
+%% competition_verb(Keyword)                              --> [versus],{Keyword           = [versus]}.
+%% competition_verb(Keyword)                              --> [against],{Keyword          = [against]}.
+%% competition_verb(Keyword)                              --> [beat],{Keyword             = [beat]}.
+%% competition_verb(Keyword)                              --> [defeat],{Keyword           = [defeat]}.
+%% competition_verb(Keyword)                              --> [won],{Keyword              = [won]}.
+
+%% preference_verb(Keyword)                               --> [like],{Keyword             = [like]}.
+%% preference_verb(Keyword)                               --> [love],{Keyword             = [love]}.
+
+%% media_verb(Keyword)                                    --> [to,listen,to],{Keyword     = [to,listen,to]}.
+%% media_verb(Keyword)                                    --> [to,listen],{Keyword        = [to,listen]}.
+%% media_verb(Keyword)                                    --> [listen,to],{Keyword        = [listen,to]}.
+%% media_verb(Keyword)                                    --> [listen],{Keyword           = [listen]}.
+%% media_verb(Keyword)                                    --> [to,read],{Keyword          = [to,read]}.
+%% media_verb(Keyword)                                    --> [read],{Keyword             = [read]}.
+%% media_verb(Keyword)                                    --> [seen],{Keyword             = [seen]}.
+%% media_verb(Keyword)                                    --> [to,watch],{Keyword         = [to,watch]}.
+%% media_verb(Keyword)                                    --> [watch],{Keyword            = [watch]}.
+
+%% regional_identifying_event(Keyword)                    --> [tornado],{Keyword          = [tornado]}.
+%% regional_identifying_event(Keyword)                    --> [earthquake],{Keyword       = [earthquake]}.
+%% regional_identifying_event(Keyword)                    --> [hurricane],{Keyword        = [hurricane]}.
+%% regional_identifying_event(Keyword)                    --> [election],{Keyword         = [election]}.
+%% regional_identifying_event(Keyword)                    --> [strike],{Keyword           = [strike]}.
+%% regional_identifying_event(Keyword)                    --> [eclipse],{Keyword          = [eclipse]}.
+%% regional_identifying_event(Keyword)                    --> [shooting],{Keyword         = [shooting]}.
+%% regional_identifying_event(Keyword)                    --> [snow],{Keyword             = [snow]}.
+%% regional_identifying_event(Keyword)                    --> [blizzard],{Keyword         = [blizzard]}.
+%% regional_identifying_event(Keyword)                    --> [filming],{Keyword          = [filming]}.
+%% regional_identifying_event(Keyword)                    --> [filmed],{Keyword           = [filmed]}.
+
+%% ticket(Keyword)                                        --> [ticket],{Keyword           = [ticket]}.
+%% ticket(Keyword)                                        --> [tickets],{Keyword          = [tickets]}.
+%% ticket(Keyword)                                        --> [tix],{Keyword              = [tix]}.
+%% ticket(Keyword)                                        --> [pass],{Keyword             = [pass]}.
+%% ticket(Keyword)                                        --> [passes],{Keyword           = [passes]}.
+
+%% preposition(Keyword)                                   --> [to],{Keyword               = [to]}.
+%% preposition(Keyword)                                   --> [for],{Keyword              = [for]}.
+%% preposition(Keyword)                                   --> [in],{Keyword               = [in]}.
+%% preposition(Keyword)                                   --> [up],{Keyword               = [up]}.
+%% preposition(Keyword)                                   --> [on],{Keyword               = [on]}.
+%% preposition(Keyword)                                   --> [at],{Keyword               = [at]}.
+
+%% exposure_verb(Keyword)                                 --> [do],{Keyword               = [do]}.
+%% exposure_verb(Keyword)                                 --> [play],{Keyword             = [play]}.
+%% exposure_verb(Keyword)                                 --> [go,to],{Keyword            = [go,to]}.
+%% exposure_verb(Keyword)                                 --> [live],{Keyword             = [live]}.
+%% exposure_verb(Keyword)                                 --> [study],{Keyword            = [study]}.
+%% exposure_verb(Keyword)                                 --> [like],{Keyword             = [like]}.
+%% exposure_verb(Keyword)                                 --> [watch],{Keyword            = [watch]}.
+%% exposure_verb(Keyword)                                 --> [listen,to],{Keyword        = [listen,to]}.
+%% exposure_verb(Keyword)                                 --> [take],{Keyword             = [take]}.
+%% exposure_verb(Keyword)                                 --> [know],{Keyword             = [know]}.
+%% exposure_verb(Keyword)                                 --> [speak],{Keyword            = [speak]}.
+%% exposure_verb(Keyword)                                 --> [want,to],{Keyword          = [want,to]}.
+%% exposure_verb(Keyword)                                 --> [make],{Keyword             = [make]}.
+%% exposure_verb(Keyword)                                 --> [build],{Keyword            = [build]}.
+%% exposure_verb(Keyword)                                 --> [race],{Keyword             = [race]}.
+%% exposure_verb(Keyword)                                 --> [ride],{Keyword             = [ride]}.
+%% exposure_verb(Keyword)                                 --> [drive],{Keyword            = [drive]}.
+%% exposure_verb(Keyword)                                 --> [work],{Keyword             = [work]}.
+
+%% possessive_verb(Keyword)                               --> [have],{Keyword             = [have]}.
+%% possessive_verb(Keyword)                               --> [got],{Keyword              = [got]}.
+
+%% to_be_verb(Keyword)                                    --> [is],{Keyword               = [is]}.
+%% to_be_verb(Keyword)                                    --> [am],{Keyword               = [am]}.
+%% to_be_verb(Keyword)                                    --> [are],{Keyword              = [are]}.
+%% to_be_verb(Keyword)                                    --> [was],{Keyword              = [was]}.
+
+%% future_to_be(Keyword)                                  --> [will,be],{Keyword          = [will,be]}.
+
+%% future_location_verb(Keyword)                          --> [going,to],{Keyword         = [going,to]}.
+
+%% performance_verb(Keyword)                              --> [going],{Keyword            = [going]}.
+%% performance_verb(Keyword)                              --> [watch],{Keyword            = [watch]}.
+%% performance_verb(Keyword)                              --> [see],{Keyword              = [see]}.
+%% performance_verb(Keyword)                              --> [playing],{Keyword          = [playing]}.
+%% performance_verb(Keyword)                              --> [performing],{Keyword       = [performing]}.
+%% performance_verb(Keyword)                              --> [showing],{Keyword          = [showing]}.
+
+%% first_person_singular_contracted_pronoun_verb(Keyword) --> [ive],{Keyword              = [ive]}.
+%% first_person_singular_contracted_pronoun_verb(Keyword) --> [id],{Keyword               = [id]}.
+%% first_person_singular_contracted_pronoun_verb(Keyword) --> [ill],{Keyword              = [ill]}.
+%% first_person_singular_contracted_pronoun_verb(Keyword) --> [im],{Keyword               = [im]}.
+%% second_person_contracted_pronoun_verb(Keyword)         --> [youve],{Keyword            = [youve]}.
+%% second_person_contracted_pronoun_verb(Keyword)         --> [youd],{Keyword             = [youd]}.
+%% second_person_contracted_pronoun_verb(Keyword)         --> [youll],{Keyword            = [youll]}.
+%% second_person_contracted_pronoun_verb(Keyword)         --> [youre],{Keyword            = [youre]}.
+%% first_person_plural_contracted_pronoun_verb(Keyword)   --> [weve],{Keyword             = [weve]}.
+%% first_person_plural_contracted_pronoun_verb(Keyword)   --> [wed],{Keyword              = [wed]}.
+%% first_person_plural_contracted_pronoun_verb(Keyword)   --> [well],{Keyword             = [well]}.
+%% first_person_plural_contracted_pronoun_verb(Keyword)   --> [were],{Keyword             = [were]}.
+%% third_person_plural_contracted_pronoun_verb(Keyword)   --> [theyve],{Keyword           = [theyve]}.
+%% third_person_plural_contracted_pronoun_verb(Keyword)   --> [theyd],{Keyword            = [theyd]}.
+%% third_person_plural_contracted_pronoun_verb(Keyword)   --> [theyll],{Keyword           = [theyll]}.
+%% third_person_plural_contracted_pronoun_verb(Keyword)   --> [theyre],{Keyword           = [theyre]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [hed],{Keyword              = [hed]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [hell],{Keyword             = [hell]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [hes],{Keyword              = [hes]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [shed],{Keyword             = [shed]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [shell],{Keyword            = [shell]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [shes],{Keyword             = [shes]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [itd],{Keyword              = [itd]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [itll],{Keyword             = [itll]}.
+%% third_person_singular_contracted_pronoun_verb(Keyword) --> [its],{Keyword              = [its]}.
+
+%% grandfather_noun(Keyword)                              --> [grandfather],{Keyword      = [grandfather]}.
+%% grandfather_noun(Keyword)                              --> [grandpa],{Keyword          = [grandpa]}.
+%% grandmother_noun(Keyword)                              --> [grandmother],{Keyword      = [grandmother]}.
+%% grandmother_noun(Keyword)                              --> [grandma],{Keyword          = [grandma]}.
+%% father_noun(Keyword)                                   --> [father],{Keyword           = [father]}.
+%% father_noun(Keyword)                                   --> [dad],{Keyword              = [dad]}.
+%% mother_noun(Keyword)                                   --> [mother],{Keyword           = [mother]}.
+%% mother_noun(Keyword)                                   --> [mom],{Keyword              = [mom]}.
+%% brother_noun(Keyword)                                  --> [brother],{Keyword          = [brother]}.
+%% sister_noun(Keyword)                                   --> [sister],{Keyword           = [sister]}.
+%% cousin_noun(Keyword)                                   --> [cousin],{Keyword           = [cousin]}.
+%% aunt_noun(Keyword)                                     --> [aunt],{Keyword             = [aunt]}.
+%% uncle_noun(Keyword)                                    --> [uncle],{Keyword            = [uncle]}.
+
+%% determiner(Keyword)                                    --> [a],{Keyword                = [a]}.
+%% determiner(Keyword)                                    --> [the],{Keyword              = [the]}.
+%% determiner(Keyword)                                    --> [some],{Keyword             = [some]}.
+%% determiner(Keyword)                                    --> [this],{Keyword             = [this]}.
+%% determiner(Keyword)                                    --> [that],{Keyword             = [that]}.
+%% determiner(Keyword)                                    --> [those],{Keyword            = [those]}.
+%% determiner(Keyword)                                    --> [these],{Keyword            = [these]}.
+
+%% personal_pronoun(Keyword)                              --> [i],{Keyword                = [i]}.
+%% personal_pronoun(Keyword)                              --> [me],{Keyword               = [me]}.
+%% personal_pronoun(Keyword)                              --> [we],{Keyword               = [we]}.
+
+%% possessive_pronoun(Keyword)                            --> [my],{Keyword               = [my]}.
+%% possessive_pronoun(Keyword)                            --> [our],{Keyword              = [our]}.
+
+%% affirmative(Keyword)                                   --> [yes],{Keyword              = [yes]}.
+%% affirmative(Keyword)                                   --> [yeah],{Keyword             = [yeah]}.
+%% affirmative(Keyword)                                   --> [uh,huh],{Keyword           = [uh,huh]}.
+%% affirmative(Keyword)                                   --> [yup],{Keyword              = [yup]}.
+%% affirmative(Keyword)                                   --> [right],{Keyword            = [right]}.
+
+%% negative(Keyword)                                      --> [no],{Keyword               = [no]}.
+%% negative(Keyword)                                      --> [nah],{Keyword              = [nah]}.
+%% negative(Keyword)                                      --> [nuh,uh],{Keyword           = [nuh,uh]}.
+%% negative(Keyword)                                      --> [nope],{Keyword             = [nope]}.
+%% negative(Keyword)                                      --> [wrong],{Keyword            = [wrong]}.
+
+%% frequency(Keyword)                                     --> [always],{Keyword           = [always]}.
+%% frequency(Keyword)                                     --> [often],{Keyword            = [often]}.
+%% frequency(Keyword)                                     --> [all,the,time],{Keyword     = [all,the,time]}.
+%% frequency(Keyword)                                     --> [a,lot],{Keyword            = [a,lot]}.
+%% frequency(Keyword)                                     --> [every],{!},[time],{Keyword = [every,time]}.
+%% frequency(Keyword)                                     --> [never],{Keyword            = [never]}.
+%% frequency(Keyword)                                     --> [only,on],{Keyword          = [only,on]}.
+%% frequency(Keyword)                                     --> [before],{Keyword           = [before]}.
+%% frequency(Keyword)                                     --> [during],{Keyword           = [during]}.
+%% frequency(Keyword)                                     --> [after],{Keyword            = [after]}.
+%% % a little weird to have these under frequency, but it's a bit cleaner
+%% frequency(Keyword)                                     --> [dont],{Keyword             = [dont]}. 
+%% frequency(Keyword)                                     --> [do,not],{Keyword           = [do,not]}.
+
+%% time(Keyword)                                          --> [day],{Keyword              = [day]}.
+%% time(Keyword)                                          --> [week],{Keyword             = [week]}.
+%% time(Keyword)                                          --> [month],{Keyword            = [month]}.
+%% time(Keyword)                                          --> [monday],{Keyword           = [monday]}.
+%% time(Keyword)                                          --> [tuesday],{Keyword          = [tuesday]}.
+%% time(Keyword)                                          --> [wednesday],{Keyword        = [wednesday]}.
+%% time(Keyword)                                          --> [thursday],{Keyword         = [thursday]}.
+%% time(Keyword)                                          --> [friday],{Keyword           = [friday]}.
+%% time(Keyword)                                          --> [saturday],{Keyword         = [saturday]}.
+%% time(Keyword)                                          --> [sunday],{Keyword           = [sunday]}.
+%% time(Keyword)                                          --> [january],{Keyword          = [january]}.
+%% time(Keyword)                                          --> [february],{Keyword         = [february]}.
+%% time(Keyword)                                          --> [march],{Keyword            = [march]}.
+%% time(Keyword)                                          --> [april],{Keyword            = [april]}.
+%% time(Keyword)                                          --> [may],{Keyword              = [may]}.
+%% time(Keyword)                                          --> [june],{Keyword             = [june]}.
+%% time(Keyword)                                          --> [july],{Keyword             = [july]}.
+%% time(Keyword)                                          --> [august],{Keyword           = [august]}.
+%% time(Keyword)                                          --> [september],{Keyword        = [september]}.
+%% time(Keyword)                                          --> [october],{Keyword          = [october]}.
+%% time(Keyword)                                          --> [november],{Keyword         = [november]}.
+%% time(Keyword)                                          --> [december],{Keyword         = [december]}.
+%% time(Keyword)                                          --> [year],{Keyword             = [year]}.
+%% time(Keyword)                                          --> [spring],{Keyword           = [spring]}.
+%% time(Keyword)                                          --> [summer],{Keyword           = [summer]}.
+%% time(Keyword)                                          --> [fall],{Keyword             = [fall]}.
+%% time(Keyword)                                          --> [winter],{Keyword           = [winter]}.
+%% time(Keyword)                                          --> [autumn],{Keyword           = [autumn]}.
+%% time(Keyword)                                          --> [morning],{Keyword          = [morning]}.
+%% time(Keyword)                                          --> [noon],{Keyword             = [noon]}.
+%% time(Keyword)                                          --> [afternoon],{Keyword        = [afternoon]}.
+%% time(Keyword)                                          --> [evening],{Keyword          = [evening]}.
+%% time(Keyword)                                          --> [night],{Keyword            = [night]}.
+%% time(Keyword)                                          --> [midnight],{Keyword         = [midnight]}.
+%% time(Keyword)                                          --> [dawn],{Keyword             = [dawn]}.
+%% time(Keyword)                                          --> [breakfast],{Keyword        = [breakfast]}.
+%% time(Keyword)                                          --> [lunch],{Keyword            = [lunch]}.
+%% time(Keyword)                                          --> [dinner],{Keyword           = [dinner]}.
+%% time(Keyword)                                          --> [supper],{Keyword           = [supper]}.
+%% time(Keyword)                                          --> [today],{Keyword            = [today]}.
+%% time(Keyword)                                          --> [tomorrow],{Keyword         = [tomorrow]}.
+%% time(Keyword)                                          --> [tonight],{Keyword          = [tonight]}.
+%% time(Keyword)                                          --> [yesterday],{Keyword        = [yesterday]}.
+%% time(Keyword)                                          --> [this,evening],{Keyword     = [this,evening]}.
+%% time(Keyword)                                          --> [this,morning],{Keyword     = [this,morning]}.
+%% time(Keyword)                                          --> [this,afternoon],{Keyword   = [this,afternoon]}.
+
+%% location(Keyword)                                      --> [address],{Keyword          = [address]}.
+%% location(Keyword)                                      --> [city],{Keyword             = [city]}.
+%% location(Keyword)                                      --> [town],{Keyword             = [town]}.
+%% location(Keyword)                                      --> [state],{Keyword            = [state]}.
+%% location(Keyword)                                      --> [west,coast],{Keyword       = [west,coast]}.
+%% location(Keyword)                                      --> [east,coast],{Keyword       = [east,coast]}.
+%% location(Keyword)                                      --> [northwest],{Keyword        = [northwest]}.
+%% location(Keyword)                                      --> [southwest],{Keyword        = [southwest]}.
+%% location(Keyword)                                      --> [northeast],{Keyword        = [northeast]}.
+%% location(Keyword)                                      --> [southeast],{Keyword        = [southeast]}.
+%% location(Keyword)                                      --> [south],{Keyword            = [south]}.
+%% location(Keyword)                                      --> [alabama],{Keyword          = [alabama]}.
+%% location(Keyword)                                      --> [alaska],{Keyword           = [alaska]}.
+%% location(Keyword)                                      --> [arizona],{Keyword          = [arizona]}.
+%% location(Keyword)                                      --> [arkansas],{Keyword         = [arkansas]}.
+%% location(Keyword)                                      --> [california],{Keyword       = [california]}.
+%% location(Keyword)                                      --> [colorado],{Keyword         = [colorado]}.
+%% location(Keyword)                                      --> [connecticut],{Keyword      = [connecticut]}.
+%% location(Keyword)                                      --> [delaware],{Keyword         = [delaware]}.
+%% location(Keyword)                                      --> [florida],{Keyword          = [florida]}.
+%% location(Keyword)                                      --> [georgia],{Keyword          = [georgia]}.
+%% location(Keyword)                                      --> [hawaii],{Keyword           = [hawaii]}.
+%% location(Keyword)                                      --> [idaho],{Keyword            = [idaho]}.
+%% location(Keyword)                                      --> [illinois],{Keyword         = [illinois]}.
+%% location(Keyword)                                      --> [indiana],{Keyword          = [indiana]}.
+%% location(Keyword)                                      --> [iowa],{Keyword             = [iowa]}.
+%% location(Keyword)                                      --> [kansas],{Keyword           = [kansas]}.
+%% location(Keyword)                                      --> [kentucky],{Keyword         = [kentucky]}.
+%% location(Keyword)                                      --> [louisiana],{Keyword        = [louisiana]}.
+%% location(Keyword)                                      --> [maine],{Keyword            = [maine]}.
+%% location(Keyword)                                      --> [massachusetts],{Keyword    = [massachusetts]}.
+%% location(Keyword)                                      --> [maryland],{Keyword         = [maryland]}.
+%% location(Keyword)                                      --> [michigan],{Keyword         = [michigan]}.
+%% location(Keyword)                                      --> [minnesota],{Keyword        = [minnesota]}.
+%% location(Keyword)                                      --> [mississippi],{Keyword      = [mississippi]}.
+%% location(Keyword)                                      --> [missouri],{Keyword         = [missouri]}.
+%% location(Keyword)                                      --> [montana],{Keyword          = [montana]}.
+%% location(Keyword)                                      --> [nebraska],{Keyword         = [nebraska]}.
+%% location(Keyword)                                      --> [nevada],{Keyword           = [nevada]}.
+%% location(Keyword)                                      --> [new,mexico],{Keyword       = [new,mexico]}.
+%% location(Keyword)                                      --> [new,hampshire],{Keyword    = [new,hampshire]}.
+%% location(Keyword)                                      --> [new,jersey],{Keyword       = [new,jersey]}.
+%% location(Keyword)                                      --> [new,york],{Keyword         = [new,york]}.
+%% location(Keyword)                                      --> [north,carolina],{Keyword   = [north,carolina]}.
+%% location(Keyword)                                      --> [north,dakota],{Keyword     = [north,dakota]}.
+%% location(Keyword)                                      --> [ohio],{Keyword             = [ohio]}.
+%% location(Keyword)                                      --> [oklahoma],{Keyword         = [oklahoma]}.
+%% location(Keyword)                                      --> [oregon],{Keyword           = [oregon]}.
+%% location(Keyword)                                      --> [pennsylvania],{Keyword     = [pennsylvania]}.
+%% location(Keyword)                                      --> [rhode,island],{Keyword     = [rhode,island]}.
+%% location(Keyword)                                      --> [south,carolina],{Keyword   = [south,carolina]}.
+%% location(Keyword)                                      --> [south,dakota],{Keyword     = [south,dakota]}.
+%% location(Keyword)                                      --> [tennessee],{Keyword        = [tennessee]}.
+%% location(Keyword)                                      --> [texas],{Keyword            = [texas]}.
+%% location(Keyword)                                      --> [utah],{Keyword             = [utah]}.
+%% location(Keyword)                                      --> [vermont],{Keyword          = [vermont]}.
+%% location(Keyword)                                      --> [virginia],{Keyword         = [virginia]}.
+%% location(Keyword)                                      --> [washington],{Keyword       = [washington]}.
+%% location(Keyword)                                      --> [west,virginia],{Keyword    = [west,virginia]}.
+%% location(Keyword)                                      --> [wisconsin],{Keyword        = [wisconsin]}.
+%% location(Keyword)                                      --> [wyoming],{Keyword          = [wyoming]}.
+%% location(Keyword)                                      --> [washington,dc],{Keyword    = [washington,dc]}.
+%% location(Keyword)                                      --> [dc],{Keyword               = [dc]}.
+%% location(Keyword)                                      --> [school],{Keyword           = [school]}.
+%% location(Keyword)                                      --> [college],{Keyword          = [college]}.
+%% location(Keyword)                                      --> [university],{Keyword       = [university]}.
+%% location(Keyword)                                      --> [conservatory],{Keyword     = [conservatory]}.
+%% location(Keyword)                                      --> [campus],{Keyword           = [campus]}.
+%% location(Keyword)                                      --> [on,campus],{Keyword        = [on,campus]}.
+%% location(Keyword)                                      --> [off,campus],{Keyword       = [off,campus]}.
+%% location(Keyword)                                      --> [dorm],{Keyword             = [dorm]}.
+%% location(Keyword)                                      --> [dormitory],{Keyword        = [dormitory]}.
+%% location(Keyword)                                      --> [home],{Keyword             = [home]}.
+%% location(Keyword)                                      --> [apartment],{Keyword        = [apartment]}.
+
+%% common_category(Keyword)                               --> [music],{Keyword            = [music]}.
+%% common_category(Keyword)                               --> [books],{Keyword            = [books]}.
+%% common_category(Keyword)                               --> [movies],{Keyword           = [movies]}.
+%% common_category(Keyword)                               --> [bands],{Keyword            = [bands]}.
+
+%% occupation(Keyword)                                    --> [job],{Keyword              = [job]}.
+%% occupation(Keyword)                                    --> [work,study],{Keyword       = [work,study]}.
+%% occupation(Keyword)                                    --> [shift],{Keyword            = [shift]}.
+%% occupation(Keyword)                                    --> [after,class],{Keyword      = [after,class]}.
+%% occupation(Keyword)                                    --> [hours],{Keyword            = [hours]}.
+%% occupation(Keyword)                                    --> [schedule],{Keyword         = [schedule]}.
+%% occupation(Keyword)                                    --> [intern],{Keyword           = [intern]}.
+%% occupation(Keyword)                                    --> [internship],{Keyword       = [internship]}.
+%% occupation(Keyword)                                    --> [paid],{Keyword             = [paid]}.
+%% occupation(Keyword)                                    --> [paycheck],{Keyword         = [paycheck]}.
+
+%% scholastic(Keyword)                                    --> [test],{Keyword             = [test]}.
+%% scholastic(Keyword)                                    --> [final],{Keyword            = [final]}.
+%% scholastic(Keyword)                                    --> [mid,term],{Keyword         = [mid,term]}.
+%% scholastic(Keyword)                                    --> [open,book],{Keyword        = [open,book]}.
+%% scholastic(Keyword)                                    --> [open,note],{Keyword        = [open,note]}.
+%% scholastic(Keyword)                                    --> [quiz],{Keyword             = [quiz]}.
+%% scholastic(Keyword)                                    --> [exam],{Keyword             = [exam]}.
+%% scholastic(Keyword)                                    --> [homework],{Keyword         = [homework]}.
+%% scholastic(Keyword)                                    --> [project],{Keyword          = [project]}.
+%% scholastic(Keyword)                                    --> [group],{Keyword            = [group]}.
+%% scholastic(Keyword)                                    --> [partner],{Keyword          = [partner]}.
+%% scholastic(Keyword)                                    --> [class],{Keyword            = [class]}.
+%% scholastic(Keyword)                                    --> [lab],{Keyword              = [lab]}.
+%% scholastic(Keyword)                                    --> [seminar],{Keyword          = [seminar]}.
+%% scholastic(Keyword)                                    --> [professor],{Keyword        = [professor]}.
+%% scholastic(Keyword)                                    --> [faculty],{Keyword          = [faculty]}.
+%% scholastic(Keyword)                                    --> [teacher],{Keyword          = [teacher]}.
+%% scholastic(Keyword)                                    --> [ta],{Keyword               = [ta]}.
+%% scholastic(Keyword)                                    --> [notes],{Keyword            = [notes]}.
+%% scholastic(Keyword)                                    --> [grade],{Keyword            = [grade]}.
+%% scholastic(Keyword)                                    --> [attendance],{Keyword       = [attendance]}.
+%% scholastic(Keyword)                                    --> [absent],{Keyword           = [absent]}.
+%% scholastic(Keyword)                                    --> [late],{Keyword             = [late]}.
+%% scholastic(Keyword)                                    --> [sick],{Keyword             = [sick]}.
+%% scholastic(Keyword)                                    --> [makeup],{Keyword           = [makeup]}.
+%% scholastic(Keyword)                                    --> [curve],{Keyword            = [curve]}.
+%% scholastic(Keyword)                                    --> [drop],{Keyword             = [drop]}.
+%% scholastic(Keyword)                                    --> [audit],{Keyword            = [audit]}.
+%% scholastic(Keyword)                                    --> [book],{Keyword             = [book]}.
+%% scholastic(Keyword)                                    --> [lecture],{Keyword          = [lecture]}.
+%% scholastic(Keyword)                                    --> [laptop],{Keyword           = [laptop]}.
+%% scholastic(Keyword)                                    --> [classroom],{Keyword        = [classroom]}.
+%% scholastic(Keyword)                                    --> [hall],{Keyword             = [hall]}.
+%% scholastic(Keyword)                                    --> [library],{Keyword          = [library]}.
+%% scholastic(Keyword)                                    --> [bookstore],{Keyword        = [bookstore]}.
+%% scholastic(Keyword)                                    --> [period],{Keyword           = [period]}.
+%% scholastic(Keyword)                                    --> [lunch],{Keyword            = [lunch]}.
+%% scholastic(Keyword)                                    --> [after,school],{Keyword     = [after,school]}.
+%% scholastic(Keyword)                                    --> [practice],{Keyword         = [practice]}.
+%% scholastic(Keyword)                                    --> [rehearsal],{Keyword        = [rehearsal]}.
+
+%% holiday(Keyword)                                       --> [vacation],{Keyword         = [vacation]}.
+%% holiday(Keyword)                                       --> [holiday],{Keyword          = [holiday]}.
+%% holiday(Keyword)                                       --> [trip],{Keyword             = [trip]}.
+%% holiday(Keyword)                                       --> [summer],{Keyword           = [summer]}.
+%% holiday(Keyword)                                       --> [spring,break],{Keyword     = [spring,break]}.
+%% holiday(Keyword)                                       --> [spring],{Keyword           = [spring]}.
+%% holiday(Keyword)                                       --> [break],{Keyword            = [break]}.
+%% holiday(Keyword)                                       --> [winter],{Keyword           = [winter]}.
+%% holiday(Keyword)                                       --> [thanksgiving],{Keyword     = [thanksgiving]}.
+%% holiday(Keyword)                                       --> [christmas],{Keyword        = [christmas]}.
+%% holiday(Keyword)                                       --> [new,years,eve],{Keyword    = [new,years,eve]}.
+%% holiday(Keyword)                                       --> [new,year],{Keyword         = [new,year]}.
+
+%% activity(Keyword)                                      --> [rock,climbing],{Keyword    = [rock,climbing]}.
+%% activity(Keyword)                                      --> [climbing],{Keyword         = [climbing]}.
+%% activity(Keyword)                                      --> [hiking],{Keyword           = [hiking]}.
+%% activity(Keyword)                                      --> [mountain,biking],{Keyword  = [mountain,biking]}.
+%% activity(Keyword)                                      --> [biking],{Keyword           = [biking]}.
+%% activity(Keyword)                                      --> [swimming],{Keyword         = [swimming]}.
+%% activity(Keyword)                                      --> [movies],{Keyword           = [movies]}.
+%% activity(Keyword)                                      --> [theater],{Keyword          = [theater]}.
+%% activity(Keyword)                                      --> [camping],{Keyword          = [camping]}.
+%% activity(Keyword)                                      --> [surfing],{Keyword          = [surfing]}.
+%% activity(Keyword)                                      --> [running],{Keyword          = [running]}.
+%% activity(Keyword)                                      --> [jogging],{Keyword          = [jogging]}.
+%% activity(Keyword)                                      --> [canoeing],{Keyword         = [canoeing]}.
+%% activity(Keyword)                                      --> [kayaking],{Keyword         = [kayaking]}.
+%% activity(Keyword)                                      --> [parachuting],{Keyword      = [parachuting]}.
+%% activity(Keyword)                                      --> [skydiving],{Keyword        = [skydiving]}.
+%% activity(Keyword)                                      --> [hang,gliding],{Keyword     = [hang,gliding]}.
+%% activity(Keyword)                                      --> [paragliding],{Keyword      = [paragliding]}.
+%% activity(Keyword)                                      --> [rappelling],{Keyword       = [rappelling]}.
+%% activity(Keyword)                                      --> [bouldering],{Keyword       = [bouldering]}.
+%% activity(Keyword)                                      --> [skating],{Keyword          = [skating]}.
+%% activity(Keyword)                                      --> [roller,blading],{Keyword   = [roller,blading]}.
+%% activity(Keyword)                                      --> [inline,skating],{Keyword   = [inline,skating]}.
+%% activity(Keyword)                                      --> [skateboarding],{Keyword    = [skateboarding]}.
+%% activity(Keyword)                                      --> [long,boarding],{Keyword    = [long,boarding]}.
+%% activity(Keyword)                                      --> [planking],{Keyword         = [planking]}.
+%% activity(Keyword)                                      --> [gaming],{Keyword           = [gaming]}.
+%% activity(Keyword)                                      --> [drinking],{Keyword         = [drinking]}.
+%% activity(Keyword)                                      --> [debate],{Keyword           = [debate]}.
+
+%% sports(Keyword)                                        --> [football],{Keyword         = [football]}.
+%% sports(Keyword)                                        --> [soccer],{Keyword           = [soccer]}.
+%% sports(Keyword)                                        --> [baseball],{Keyword         = [baseball]}.
+%% sports(Keyword)                                        --> [track],{Keyword            = [track]}.
+%% sports(Keyword)                                        --> [track,and,field],{Keyword  = [track,and,field]}.
+%% sports(Keyword)                                        --> [cheer],{Keyword            = [cheer]}.
+%% sports(Keyword)                                        --> [cheer,leading],{Keyword    = [cheer,leading]}.
+%% sports(Keyword)                                        --> [wrestling],{Keyword        = [wrestling]}.
+%% sports(Keyword)                                        --> [cross,country],{Keyword    = [cross,country]}.
+%% sports(Keyword)                                        --> [swimming],{Keyword         = [swimming]}.
+%% sports(Keyword)                                        --> [water,polo],{Keyword       = [water,polo]}.
+%% sports(Keyword)                                        --> [lacrosse],{Keyword         = [lacrosse]}.
+%% sports(Keyword)                                        --> [basketball],{Keyword       = [basketball]}.
+
+%% gathering(Keyword)                                     --> [partying],{Keyword         = [partying]}.
+%% gathering(Keyword)                                     --> [dancing],{Keyword          = [dancing]}.
+%% gathering(Keyword)                                     --> [clubbing],{Keyword         = [clubbing]}.
+%% gathering(Keyword)                                     --> [hanging,out],{Keyword      = [hanging,out]}.
+%% gathering(Keyword)                                     --> [hang,out],{Keyword         = [hang,out]}.
+%% gathering(Keyword)                                     --> [sleep,over],{Keyword       = [sleep,over]}.
+%% gathering(Keyword)                                     --> [spend,the,night],{Keyword  = [spend,the,night]}.
+%% gathering(Keyword)                                     --> [stay,over],{Keyword        = [stay,over]}.
+%% gathering(Keyword)                                     --> [party],{Keyword            = [party]}.
+%% gathering(Keyword)                                     --> [game],{Keyword             = [game]}.
+%% gathering(Keyword)                                     --> [the,dance],{Keyword        = [the,dance]}.
+%% gathering(Keyword)                                     --> [homecoming],{Keyword       = [homecoming]}.
+%% gathering(Keyword)                                     --> [tolo],{Keyword             = [tolo]}.
+%% gathering(Keyword)                                     --> [sadie,hawkins],{Keyword    = [sadie,hawkins]}.
+%% gathering(Keyword)                                     --> [prom],{Keyword             = [prom]}.
+
+%% personal_identifier(Keyword)                           --> [handle],{Keyword           = [handle]}.
+%% personal_identifier(Keyword)                           --> [nick],{Keyword             = [nick]}.
+%% personal_identifier(Keyword)                           --> [nickname],{Keyword         = [nickname]}.
+%% personal_identifier(Keyword)                           --> [user,name],{Keyword        = [user,name]}.
+%% personal_identifier(Keyword)                           --> [screen,name],{Keyword      = [screen,name]}.
+%% personal_identifier(Keyword)                           --> [account,name],{Keyword     = [account,name]}.
+%% personal_identifier(Keyword)                           --> [name],{Keyword             = [name]}.
+
+%% online_service(Keyword)                                --> [facebook],{Keyword         = [facebook]}.
+%% online_service(Keyword)                                --> [myspace],{Keyword          = [myspace]}.
+%% online_service(Keyword)                                --> [twitter],{Keyword          = [twitter]}.
+%% online_service(Keyword)                                --> [skype],{Keyword            = [skype]}.
+%% online_service(Keyword)                                --> [msn],{Keyword              = [msn]}.
+%% online_service(Keyword)                                --> [icq],{Keyword              = [icq]}.
+%% online_service(Keyword)                                --> [gaia],{Keyword             = [gaia]}.
+%% online_service(Keyword)                                --> [habbo],{Keyword            = [habbo]}.
+%% online_service(Keyword)                                --> [yahoo],{Keyword            = [yahoo]}.
+%% online_service(Keyword)                                --> [gmail],{Keyword            = [gmail]}.
+%% online_service(Keyword)                                --> [formspring],{Keyword       = [formspring]}.
+%% online_service(Keyword)                                --> [flickr],{Keyword           = [flickr]}.
+%% online_service(Keyword)                                --> [picasa],{Keyword           = [picasa]}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% string tokenizing and processing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+to_lower(CurrentChar,LowerChar) :-
+  CurrentChar >= 65,
+  CurrentChar =< 90,
+  !,
+  LowerChar is CurrentChar+32.
+
+to_lower(CurrentChar,CurrentChar).
+
+char_type(9, Type) :-               !, Type=whitespace.
+char_type(10,Type) :-               !, Type=whitespace.
+char_type(11,Type) :-               !, Type=whitespace.
+char_type(12,Type) :-               !, Type=whitespace.
+char_type(13,Type) :-               !, Type=whitespace.
+char_type(32,Type) :-               !, Type=whitespace.
+char_type(C, Type) :-        C<33,  !, Type=control_code.
+char_type(C, Type) :- C>47,  C<58,  !, Type=digit.
+char_type(C, Type) :- C>64,  C<91,  !, Type=uppercase.
+char_type(C, Type) :- C>96,  C<123, !, Type=lowercase.
+char_type(C, Type) :- C>32,  C<48,  !, Type=punctuation.
+char_type(C, Type) :- C>57,  C<65,  !, Type=punctuation.
+char_type(C, Type) :- C>90,  C<97,  !, Type=punctuation.
+char_type(C, Type) :- C>122, C<128, !, Type=punctuation.
+char_type(C, Type) :- C>126,        !, Type=hi_ascii.
+
+digit(C)        --> [C], {char_type(C,digit)}.
+control_code(C) --> [C], {char_type(C,control_code)}.
+letter(C)       --> [C], {char_type(C,lowercase)}.
+letter(C)       --> [X], {char_type(X,uppercase),to_lower(X,C)}.
+punctuation(C)  --> [C], {char_type(C,punctuation)}.
+space(C)        --> [C], {char_type(C,whitespace)}.
+
+word_character(TC) --> letter(TC).
+word_character(TC) --> digit(TC).
+
+spaces([S|Ss])  --> space(S), !, spaces(Ss).
+spaces([])      --> [].
+
+any_token --> [_], any_token.
+any_token --> [].
+
+
+any_token_capture([AT|ATs]) --> [AT], any_token_capture(ATs).
+any_token_capture([])       --> [].
+
+
+word([L|Ls])    --> word_character(L), !, word(Ls).
+word([])        --> [].
+
+%rbh demarcating with digits
+%% word([L|Ls])    --> letter(L), !, word(Ls).
+%% word([])        --> [].
+
+punctuation_string([P|Ps]) --> punctuation(P), !, punctuation_string(Ps).
+punctuation_string([])     --> [].
+
+digit_string([D|Ds]) --> digit(D), !, digit_string(Ds).
+digit_string([])     --> [].
+
+token(X) --> word(X),               {add_token_type(X,word)}.
+token(X) --> punctuation_string(X), {add_token_type(X,punctuation_string)}.
+
+%rbh demarcating with digits
+%% token(X) --> word(X),               {add_token_type(X,word)}.
+%% token(X) --> punctuation_string(X), {add_token_type(X,punctuation_string)}.
+%% token(X) --> digit_string(X),       {add_token_type(X,digit_string)}.
+
+tokenize_string([H|T]) --> spaces(_),
+                           token([Token|Tokens]),
+                           {H=[Token|Tokens]},
+                           spaces(_),
+                           tokenize_string(T),
+                           !.
+tokenize_string([])    --> [].
+
+add_token_type(Token,Type) :- asserta(token_type(Token,Type)).
+purge_token_types          :- retractall(token_type(_,_)).
+
+
+flatten_tokens([User|[[64]|[Domain|[[46]|[Tld|Tt]]]]],T) :-   tld(Tld,_,_),
+                                                              flatten_tokens(Tt,T0),
+                                                              append(Tld,T0,T1),
+                                                              append([46],T1,T2),
+                                                              append(Domain,T2,T3),
+                                                              append([64],T3,T4),
+                                                              append(User,T4,T).
+%                                                              append(Th,T6,T).
+%% flatten_tokens([Left|[[46]|[Tld|Tt]]],T) :-   tld(Tld,_,_),
+%%                                               flatten_tokens(Tt,T0),
+%%                                               append(Tld,T0,T1),
+%%                                               append([46],T1,T2),
+%%                                               append(Left,T2,T3),
+%%                                               append(Th,T3,T).
+
+%% flatten_tokens([Left|[[95]|[Right|Tt]]],T) :- flatten_tokens(Tt,T0),
+%%                                               append(Right,T0,T1),
+%%                                               append([95],T1,T2),
+%%                                               append(Left,T2,T).
+%% flatten_tokens([Left|[[45]|[Right|Tt]]],T) :- flatten_tokens(Tt,T0),
+%%                                               append(Right,T0,T1),
+%%                                               append([45],T1,T2),
+%%                                               append(Left,T2,T).
+%% flatten_tokens([Left|[[44]|[Right|Tt]]],T) :- flatten_tokens(Tt,T0),
+%%                                               append(Right,T0,T1),
+%%                                               append(" ",T1,T2),
+%%                                               append([44],T2,T3),
+%%                                               append(Left,T3,T).
+%% flatten_tokens([Th|Tt],T)                  :- flatten_tokens(Tt,T0),
+%%                                               append(" ",T0,T1),
+%%                                               append(Th,T1,T).
+%% flatten_tokens([],[]).
+
+flatten_tokens([Th|Tt],T)                  :- flatten_tokens(Tt,T0),
+                                              append(Th,T0,T).
+flatten_tokens([],[]).
+
+%////////////////////////////////////////////////////////////////////
+% utilities
+%////////////////////////////////////////////////////////////////////
+
+ignore(Goal) :- Goal, !.
+ignore(_).
+:- export ignore/1.
+
+add_user_item(Taxonomy,Entity,Item)
+:-
+expand_term((user_item(Taxonomy_tag,
+                       Entity_tag,
+                       Item_tag)
+             -->
+             Item,
+             {Taxonomy_tag=Taxonomy,Entity_tag=Entity,Item_tag=Item}),
+             ExpandedTerm),
+             asserta(ExpandedTerm).
+
+nlp_result(PostId,
+           NlpClassification,
+           Taxonomy,
+           Entity,
+           Item)
+:-
+flatten_tokens(Taxonomy,Taxonomy_flat),
+flatten_tokens(Entity,Entity_flat),
+flatten_tokens(Item,Item_flat),
+store_nlp_result(PostId,
+                 NlpClassification,
+                 Taxonomy_flat,
+                 Entity_flat,
+                 Item_flat).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% token format & pattern recognition
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+tld(T) --> ["ac"],{T="ac"}.
+tld(T) --> ["ad"],{T="ad"}.
+tld(T) --> ["ae"],{T="ae"}.
+tld(T) --> ["af"],{T="af"}.
+tld(T) --> ["ag"],{T="ag"}.
+tld(T) --> ["ai"],{T="ai"}.
+tld(T) --> ["al"],{T="al"}.
+tld(T) --> ["am"],{T="am"}.
+tld(T) --> ["an"],{T="an"}.
+tld(T) --> ["ao"],{T="ao"}.
+tld(T) --> ["aq"],{T="aq"}.
+tld(T) --> ["ar"],{T="ar"}.
+tld(T) --> ["as"],{T="as"}.
+tld(T) --> ["at"],{T="at"}.
+tld(T) --> ["au"],{T="au"}.
+tld(T) --> ["aw"],{T="aw"}.
+tld(T) --> ["ax"],{T="ax"}.
+tld(T) --> ["az"],{T="az"}.
+tld(T) --> ["ba"],{T="ba"}.
+tld(T) --> ["bb"],{T="bb"}.
+tld(T) --> ["bd"],{T="bd"}.
+tld(T) --> ["be"],{T="be"}.
+tld(T) --> ["bf"],{T="bf"}.
+tld(T) --> ["bg"],{T="bg"}.
+tld(T) --> ["bh"],{T="bh"}.
+tld(T) --> ["bi"],{T="bi"}.
+tld(T) --> ["bj"],{T="bj"}.
+tld(T) --> ["bm"],{T="bm"}.
+tld(T) --> ["bn"],{T="bn"}.
+tld(T) --> ["bo"],{T="bo"}.
+tld(T) --> ["br"],{T="br"}.
+tld(T) --> ["bs"],{T="bs"}.
+tld(T) --> ["bt"],{T="bt"}.
+tld(T) --> ["bv"],{T="bv"}.
+tld(T) --> ["bw"],{T="bw"}.
+tld(T) --> ["by"],{T="by"}.
+tld(T) --> ["bz"],{T="bz"}.
+tld(T) --> ["ca"],{T="ca"}.
+tld(T) --> ["cc"],{T="cc"}.
+tld(T) --> ["cd"],{T="cd"}.
+tld(T) --> ["cf"],{T="cf"}.
+tld(T) --> ["cg"],{T="cg"}.
+tld(T) --> ["ch"],{T="ch"}.
+tld(T) --> ["ci"],{T="ci"}.
+tld(T) --> ["ck"],{T="ck"}.
+tld(T) --> ["cl"],{T="cl"}.
+tld(T) --> ["cm"],{T="cm"}.
+tld(T) --> ["cn"],{T="cn"}.
+tld(T) --> ["co"],{T="co"}.
+tld(T) --> ["cr"],{T="cr"}.
+tld(T) --> ["cs"],{T="cs"}.
+tld(T) --> ["cu"],{T="cu"}.
+tld(T) --> ["cv"],{T="cv"}.
+tld(T) --> ["cx"],{T="cx"}.
+tld(T) --> ["cy"],{T="cy"}.
+tld(T) --> ["cz"],{T="cz"}.
+tld(T) --> ["dd"],{T="dd"}.
+tld(T) --> ["de"],{T="de"}.
+tld(T) --> ["dj"],{T="dj"}.
+tld(T) --> ["dk"],{T="dk"}.
+tld(T) --> ["dm"],{T="dm"}.
+tld(T) --> ["do"],{T="do"}.
+tld(T) --> ["dz"],{T="dz"}.
+tld(T) --> ["ec"],{T="ec"}.
+tld(T) --> ["ee"],{T="ee"}.
+tld(T) --> ["eg"],{T="eg"}.
+tld(T) --> ["eh"],{T="eh"}.
+tld(T) --> ["er"],{T="er"}.
+tld(T) --> ["es"],{T="es"}.
+tld(T) --> ["et"],{T="et"}.
+tld(T) --> ["eu"],{T="eu"}.
+tld(T) --> ["fi"],{T="fi"}.
+tld(T) --> ["fj"],{T="fj"}.
+tld(T) --> ["fk"],{T="fk"}.
+tld(T) --> ["fm"],{T="fm"}.
+tld(T) --> ["fo"],{T="fo"}.
+tld(T) --> ["fr"],{T="fr"}.
+tld(T) --> ["ga"],{T="ga"}.
+tld(T) --> ["gb"],{T="gb"}.
+tld(T) --> ["gd"],{T="gd"}.
+tld(T) --> ["ge"],{T="ge"}.
+tld(T) --> ["gf"],{T="gf"}.
+tld(T) --> ["gg"],{T="gg"}.
+tld(T) --> ["gh"],{T="gh"}.
+tld(T) --> ["gi"],{T="gi"}.
+tld(T) --> ["gl"],{T="gl"}.
+tld(T) --> ["gm"],{T="gm"}.
+tld(T) --> ["gn"],{T="gn"}.
+tld(T) --> ["gp"],{T="gp"}.
+tld(T) --> ["gq"],{T="gq"}.
+tld(T) --> ["gr"],{T="gr"}.
+tld(T) --> ["gs"],{T="gs"}.
+tld(T) --> ["gt"],{T="gt"}.
+tld(T) --> ["gu"],{T="gu"}.
+tld(T) --> ["gw"],{T="gw"}.
+tld(T) --> ["gy"],{T="gy"}.
+tld(T) --> ["hk"],{T="hk"}.
+tld(T) --> ["hm"],{T="hm"}.
+tld(T) --> ["hn"],{T="hn"}.
+tld(T) --> ["hr"],{T="hr"}.
+tld(T) --> ["ht"],{T="ht"}.
+tld(T) --> ["hu"],{T="hu"}.
+tld(T) --> ["id"],{T="id"}.
+tld(T) --> ["ie"],{T="ie"}.
+tld(T) --> ["il"],{T="il"}.
+tld(T) --> ["im"],{T="im"}.
+tld(T) --> ["in"],{T="in"}.
+tld(T) --> ["io"],{T="io"}.
+tld(T) --> ["iq"],{T="iq"}.
+tld(T) --> ["ir"],{T="ir"}.
+tld(T) --> ["is"],{T="is"}.
+tld(T) --> ["it"],{T="it"}.
+tld(T) --> ["je"],{T="je"}.
+tld(T) --> ["jm"],{T="jm"}.
+tld(T) --> ["jo"],{T="jo"}.
+tld(T) --> ["jp"],{T="jp"}.
+tld(T) --> ["ke"],{T="ke"}.
+tld(T) --> ["kg"],{T="kg"}.
+tld(T) --> ["kh"],{T="kh"}.
+tld(T) --> ["ki"],{T="ki"}.
+tld(T) --> ["km"],{T="km"}.
+tld(T) --> ["kn"],{T="kn"}.
+tld(T) --> ["kp"],{T="kp"}.
+tld(T) --> ["kr"],{T="kr"}.
+tld(T) --> ["kw"],{T="kw"}.
+tld(T) --> ["ky"],{T="ky"}.
+tld(T) --> ["kz"],{T="kz"}.
+tld(T) --> ["la"],{T="la"}.
+tld(T) --> ["lb"],{T="lb"}.
+tld(T) --> ["lc"],{T="lc"}.
+tld(T) --> ["li"],{T="li"}.
+tld(T) --> ["lk"],{T="lk"}.
+tld(T) --> ["lr"],{T="lr"}.
+tld(T) --> ["ls"],{T="ls"}.
+tld(T) --> ["lt"],{T="lt"}.
+tld(T) --> ["lu"],{T="lu"}.
+tld(T) --> ["lv"],{T="lv"}.
+tld(T) --> ["ly"],{T="ly"}.
+tld(T) --> ["ma"],{T="ma"}.
+tld(T) --> ["mc"],{T="mc"}.
+tld(T) --> ["md"],{T="md"}.
+tld(T) --> ["me"],{T="me"}.
+tld(T) --> ["mg"],{T="mg"}.
+tld(T) --> ["mh"],{T="mh"}.
+tld(T) --> ["mk"],{T="mk"}.
+tld(T) --> ["ml"],{T="ml"}.
+tld(T) --> ["mm"],{T="mm"}.
+tld(T) --> ["mn"],{T="mn"}.
+tld(T) --> ["mo"],{T="mo"}.
+tld(T) --> ["mp"],{T="mp"}.
+tld(T) --> ["mq"],{T="mq"}.
+tld(T) --> ["mr"],{T="mr"}.
+tld(T) --> ["ms"],{T="ms"}.
+tld(T) --> ["mt"],{T="mt"}.
+tld(T) --> ["mu"],{T="mu"}.
+tld(T) --> ["mv"],{T="mv"}.
+tld(T) --> ["mw"],{T="mw"}.
+tld(T) --> ["mx"],{T="mx"}.
+tld(T) --> ["my"],{T="my"}.
+tld(T) --> ["mz"],{T="mz"}.
+tld(T) --> ["na"],{T="na"}.
+tld(T) --> ["nc"],{T="nc"}.
+tld(T) --> ["ne"],{T="ne"}.
+tld(T) --> ["nf"],{T="nf"}.
+tld(T) --> ["ng"],{T="ng"}.
+tld(T) --> ["ni"],{T="ni"}.
+tld(T) --> ["nl"],{T="nl"}.
+tld(T) --> ["no"],{T="no"}.
+tld(T) --> ["np"],{T="np"}.
+tld(T) --> ["nr"],{T="nr"}.
+tld(T) --> ["nu"],{T="nu"}.
+tld(T) --> ["nz"],{T="nz"}.
+tld(T) --> ["om"],{T="om"}.
+tld(T) --> ["pa"],{T="pa"}.
+tld(T) --> ["pe"],{T="pe"}.
+tld(T) --> ["pf"],{T="pf"}.
+tld(T) --> ["pg"],{T="pg"}.
+tld(T) --> ["ph"],{T="ph"}.
+tld(T) --> ["pk"],{T="pk"}.
+tld(T) --> ["pl"],{T="pl"}.
+tld(T) --> ["pm"],{T="pm"}.
+tld(T) --> ["pn"],{T="pn"}.
+tld(T) --> ["pr"],{T="pr"}.
+tld(T) --> ["ps"],{T="ps"}.
+tld(T) --> ["pt"],{T="pt"}.
+tld(T) --> ["pw"],{T="pw"}.
+tld(T) --> ["py"],{T="py"}.
+tld(T) --> ["qa"],{T="qa"}.
+tld(T) --> ["re"],{T="re"}.
+tld(T) --> ["ro"],{T="ro"}.
+tld(T) --> ["rs"],{T="rs"}.
+tld(T) --> ["ru"],{T="ru"}.
+tld(T) --> ["rw"],{T="rw"}.
+tld(T) --> ["sa"],{T="sa"}.
+tld(T) --> ["sb"],{T="sb"}.
+tld(T) --> ["sc"],{T="sc"}.
+tld(T) --> ["sd"],{T="sd"}.
+tld(T) --> ["se"],{T="se"}.
+tld(T) --> ["sg"],{T="sg"}.
+tld(T) --> ["sh"],{T="sh"}.
+tld(T) --> ["si"],{T="si"}.
+tld(T) --> ["sj"],{T="sj"}.
+tld(T) --> ["sk"],{T="sk"}.
+tld(T) --> ["sl"],{T="sl"}.
+tld(T) --> ["sm"],{T="sm"}.
+tld(T) --> ["sn"],{T="sn"}.
+tld(T) --> ["so"],{T="so"}.
+tld(T) --> ["sr"],{T="sr"}.
+tld(T) --> ["ss"],{T="ss"}.
+tld(T) --> ["st"],{T="st"}.
+tld(T) --> ["su"],{T="su"}.
+tld(T) --> ["sv"],{T="sv"}.
+tld(T) --> ["sx"],{T="sx"}.
+tld(T) --> ["sy"],{T="sy"}.
+tld(T) --> ["sz"],{T="sz"}.
+tld(T) --> ["tc"],{T="tc"}.
+tld(T) --> ["td"],{T="td"}.
+tld(T) --> ["tf"],{T="tf"}.
+tld(T) --> ["tg"],{T="tg"}.
+tld(T) --> ["th"],{T="th"}.
+tld(T) --> ["tj"],{T="tj"}.
+tld(T) --> ["tk"],{T="tk"}.
+tld(T) --> ["tl"],{T="tl"}.
+tld(T) --> ["tm"],{T="tm"}.
+tld(T) --> ["tn"],{T="tn"}.
+tld(T) --> ["to"],{T="to"}.
+tld(T) --> ["tp"],{T="tp"}.
+tld(T) --> ["tr"],{T="tr"}.
+tld(T) --> ["tt"],{T="tt"}.
+tld(T) --> ["tv"],{T="tv"}.
+tld(T) --> ["tw"],{T="tw"}.
+tld(T) --> ["tz"],{T="tz"}.
+tld(T) --> ["ua"],{T="ua"}.
+tld(T) --> ["ug"],{T="ug"}.
+tld(T) --> ["uk"],{T="uk"}.
+tld(T) --> ["us"],{T="us"}.
+tld(T) --> ["uy"],{T="uy"}.
+tld(T) --> ["uz"],{T="uz"}.
+tld(T) --> ["va"],{T="va"}.
+tld(T) --> ["vc"],{T="vc"}.
+tld(T) --> ["ve"],{T="ve"}.
+tld(T) --> ["vg"],{T="vg"}.
+tld(T) --> ["vi"],{T="vi"}.
+tld(T) --> ["vn"],{T="vn"}.
+tld(T) --> ["vu"],{T="vu"}.
+tld(T) --> ["wf"],{T="wf"}.
+tld(T) --> ["ws"],{T="ws"}.
+tld(T) --> ["ye"],{T="ye"}.
+tld(T) --> ["yt"],{T="yt"}.
+tld(T) --> ["yu"],{T="yu"}.
+tld(T) --> ["za"],{T="za"}.
+tld(T) --> ["zm"],{T="zm"}.
+tld(T) --> ["zw"],{T="zw"}.
+
+tld(T) --> ["edu"],{T="edu"}.
+tld(T) --> ["gov"],{T="gov"}.
+tld(T) --> ["mil"],{T="mil"}.
+
+tld(T) --> ["aero"],  {T="aero"}.
+tld(T) --> ["asia"],  {T="asia"}.
+tld(T) --> ["biz"],   {T="biz"}.
+tld(T) --> ["cat"],   {T="cat"}.
+tld(T) --> ["com"],   {T="com"}.
+tld(T) --> ["coop"],  {T="coop"}.
+tld(T) --> ["info"],  {T="info"}.
+tld(T) --> ["int"],   {T="int"}.
+tld(T) --> ["jobs"],  {T="jobs"}.
+tld(T) --> ["mobi"],  {T="mobi"}.
+tld(T) --> ["museum"],{T="museum"}.
+tld(T) --> ["name"],  {T="name"}.
+tld(T) --> ["net"],   {T="net"}.
+tld(T) --> ["org"],   {T="org"}.
+tld(T) --> ["pro"],   {T="pro"}.
+tld(T) --> ["tel"],   {T="tel"}.
+tld(T) --> ["travel"],{T="travel"}.
+tld(T) --> ["xxx"],   {T="xxx"}.
+
+scheme_name(S) --> ["http"],  {S="http"}.
+scheme_name(S) --> ["https"], {S="https"}.
+scheme_name(S) --> ["ftp"],   {S="ftp"}.
+scheme_name(S) --> ["file"],  {S="file"}.
+
+colon_slash_slash(C) --> ["://"],{C="://"}.
+
+url_path([S,W|UPs]) --> ["/"], {S="/"}, [W], {token_type(W,word)}, url_path(UPs).
+url_path([S,W|UPs]) --> ["/"], {S="/"}, [W], {token_type(W,digit_string)}, url_path(UPs).
+url_path([S,W|UPs]) --> [W], {token_type(W,word)}, url_path(UPs).
+url_path([S,W|UPs]) --> [W], {token_type(W,digit_string)}, url_path(UPs).
+url_path([S,W|UPs]) --> ["."], {S="."}, [W], {token_type(W,word)}, url_path(UPs).
+
+url_path([])        --> [].
+
+url(U) --> scheme_name(S),
+           colon_slash_slash(C),
+           any_token_capture(D),
+           ["."],
+           tld(T),
+           url_path(UP),!,
+           {flatten_tokens(D,DF),
+            flatten_tokens(UP,UPF),
+            append(S,C,U0),
+            append(U0,DF,U1),
+            append(U1,".",U2),
+            append(U2,T,U3),
+            append(U3,UPF,U4),
+            U=[U4]}.
+
+email_address(EA) --> [InitialUserToken],
+                      any_token_capture(UserTokens),
+                      ["@"],!,
+                      any_token_capture(DomainTokens),
+                      ["."],!,
+                      tld(T),
+                      {flatten_tokens(UserTokens,UserTokensFlat),
+                       flatten_tokens(DomainTokens,DomainTokensFlat),
+                       append(InitialUserToken,UserTokensFlat,EA0),
+                       append(EA0,"@",EA1),
+                       append(EA1,DomainTokensFlat,EA2),
+                       append(EA2,".",EA3),
+                       append(EA3,T,EA4),
+                       EA=[EA4]}.
+
+%% hashtag(X)       --> [X].
+
+

@@ -1,0 +1,25 @@
+<!-- analysis incidents -->
+
+<template name="exposureIncident">
+
+  <div id="accordion" role="tablist" aria-multiselectable="true" class="panel-group" style="margin-bottom: 1cm; width: 90%; margin-left: auto; margin-right: auto;">
+    <div class="panel panel-default">
+      <div id="headingOne" role="tab" class="panel-heading">
+        <h4 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse{{counter}}" aria-expanded="true" aria-controls="collapse{{counter}}">{{title}}</a>
+        </h4>
+      </div>
+      <div id="collapse{{counter}}" role="tabpanel" aria-labelledby="headingOne" class="panel-collapse collapse">
+        <div class="panel-body">
+          <div>{{description}}</div>
+          <br/>
+          <br/>
+          {{#each postedDataItems uuid}}
+             {{> postedDataItem}}
+          {{/each}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
