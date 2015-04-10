@@ -3,4 +3,5 @@
 *.c.o
 *.xwam
 CMakeCache.txt
+*.dylib
 .DS_Store
