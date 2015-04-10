@@ -17,8 +17,7 @@ Prolog:
 		- consult(pcurl, [cc_opts('-O2 -I/Users/sparrow/XSB/emu -I/Users/sparrow/XSB/config/i386-apple-darwin13.3.0')](#)).
 
 	- this needs to be changed to work with the local XSB paths. Just launch xsb and issue the command, it should compile and produce the extension
-	- N.B. XSB is a extraordinarily finicky about where it is and how it's launched. The upshot is that on \*nix systems a symlink won't work. It's necessary to use the entire path each time (hmmm...unless I was always trying it with soft links...maybe a hard link, or vice versa, would work...dunno...I'll have to try it sometime)
-
+	- N.B. XSB is a extraordinarily finicky about where it is and how it's launched. The upshot is that on \*nix systems a symlink won't work. It's necessary to use the entire path each time.
 Mongdodb
 - install from mongodb.org
 - create a db called 'meteor'
