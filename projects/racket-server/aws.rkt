@@ -306,7 +306,7 @@
                                   url
                                   (string->bytes/utf-8 payload)
                                   (get-header-list header-hash)))])
-                  (cond [(string=? "200" (get-http-status-code response)) #t]
+                  (cond [(string=? "200" (get-http-status-code response)) `(#t . 200)]
                         [(string=? "307" (get-http-status-code response)) (let* ([response-xexpr     (get-response-xml-xexpr response)]
                                                                                  [temporary-redirect (se-path* '(Endpoint) response-xexpr)])
                                                                             (set-url-host! url temporary-redirect)
@@ -329,15 +329,15 @@
                                                                                               (string->bytes/utf-8 payload)
                                                                                               (get-header-list header-hash)))])
                                                                               (if (string=? "200" (get-http-status-code response))
-                                                                                  #t
+                                                                                  `(#t . 200)
                                                                                   (begin (newline)
                                                                                          (display response)
                                                                                          (newline)
-                                                                                         #f))))]
+                                                                                         `(#f . (get-http-status-code response))))))]
                         [else                                             (begin (newline)
                                                                                  (display response)
                                                                                  (newline)
-                                                                                 #f)])))))
+                                                                                 `(#f . (get-http-status-code response)))])))))
 
 (define (sqs-delete-message receipt-handle queue-name)
   (let-values ([(date-stamp x-amz-date rfc-2822) (date-stamp-and-x-amz-date-and-rfc2822)])
@@ -379,7 +379,7 @@
                                   url
                                   (string->bytes/utf-8 payload)
                                   (get-header-list header-hash)))])
-                  (cond [(string=? "200" (get-http-status-code response)) #t]
+                  (cond [(string=? "200" (get-http-status-code response)) `(#t . 200)]
                         [(string=? "307" (get-http-status-code response)) (let* ([response-xexpr     (get-response-xml-xexpr response)]
                                                                                  [temporary-redirect (se-path* '(Endpoint) response-xexpr)])
                                                                             (set-url-host! url temporary-redirect)
@@ -402,15 +402,15 @@
                                                                                               (string->bytes/utf-8 payload)
                                                                                               (get-header-list header-hash)))])
                                                                               (if (string=? "200" (get-http-status-code response))
-                                                                                  #t
+                                                                                  `(#t . 200)
                                                                                   (begin (newline)
                                                                                          (display response)
                                                                                          (newline)
-                                                                                         #f))))]
+                                                                                         `(#f . (get-http-status-code response))))))]
                         [else                                             (begin (newline)
                                                                                  (display response)
                                                                                  (newline)
-                                                                                 #f)])))))
+                                                                                 `(#f . (get-http-status-code response)))])))))
 
 (define (sqs-receive-message queue-name)
   (let-values ([(date-stamp x-amz-date rfc-2822) (date-stamp-and-x-amz-date-and-rfc2822)])
@@ -453,9 +453,9 @@
                   (cond [(string=? "200" (get-http-status-code response)) (let* ([response-xexpr  (get-response-xml-xexpr response)]
                                                                                  [receipt-handle  (se-path* '(ReceiptHandle) response-xexpr)]
                                                                                  [message-body    (se-path* '(Body) response-xexpr)])
-                                                                            (if (and receipt-handle (sqs-delete-message receipt-handle queue-name))
-                                                                                message-body
-                                                                                #f))]
+                                                                            (if (and receipt-handle (car (sqs-delete-message receipt-handle queue-name)))
+                                                                                `(#t . ,message-body)
+                                                                                `(#f . 200)))]
                         [(string=? "307" (get-http-status-code response)) (let* ([response-xexpr     (get-response-xml-xexpr response)]
                                                                                  [temporary-redirect (se-path* '(Endpoint) response-xexpr)])
                                                                             (set-url-host! url temporary-redirect)
@@ -477,15 +477,20 @@
                                                                                               url
                                                                                               (get-header-list header-hash)))])
                                                                               (if (string=? "200" (get-http-status-code response))
-                                                                                  #t
+                                                                                  (let* ([response-xexpr  (get-response-xml-xexpr response)]
+                                                                                         [receipt-handle  (se-path* '(ReceiptHandle) response-xexpr)]
+                                                                                         [message-body    (se-path* '(Body) response-xexpr)])
+                                                                                    (if (and receipt-handle (car (sqs-delete-message receipt-handle queue-name)))
+                                                                                        `(#t . ,message-body)
+                                                                                        `(#f . 200)))
                                                                                   (begin (newline)
                                                                                          (display response)
                                                                                          (newline)
-                                                                                         #f))))]
+                                                                                         `(#f . (get-http-status-code response))))))]
                         [else                                             (begin (newline)
                                                                                  (display response)
                                                                                  (newline)
-                                                                                 #f)])))))
+                                                                                 `(#f . (get-http-status-code response)))])))))
 
 (define (s3-put name data storage-name)
   (let-values ([(date-stamp x-amz-date rfc-2822) (date-stamp-and-x-amz-date-and-rfc2822)])
@@ -528,7 +533,7 @@
                                   url
                                   (string->bytes/utf-8 encoded-data)
                                   (get-header-list header-hash)))])
-                  (cond [(string=? "200" (get-http-status-code response)) #t]
+                  (cond [(string=? "200" (get-http-status-code response)) `(#t . 200)]
                         [(string=? "307" (get-http-status-code response)) (let* ([response-xexpr     (get-response-xml-xexpr response)]
                                                                                  [temporary-redirect (se-path* '(Endpoint) response-xexpr)])
                                                                             (set-url-host! url temporary-redirect)
@@ -555,15 +560,15 @@
                                                                                               (string->bytes/utf-8 encoded-data)
                                                                                               (get-header-list header-hash)))])
                                                                               (if (string=? "200" (get-http-status-code response))
-                                                                                  #t
+                                                                                  `(#t . 200)
                                                                                   (begin (newline)
                                                                                          (display response)
                                                                                          (newline)
-                                                                                         #f))))]
+                                                                                         `(#f . (get-http-status-code response))))))]
                         [else                                             (begin (newline)
                                                                                  (display response)
                                                                                  (newline)
-                                                                                 #f)])))))
+                                                                                 `(#f . (get-http-status-code response)))])))))
 
 
 (define (s3-get name storage-name)
@@ -601,12 +606,12 @@
                                   url
                                   (get-header-list header-hash)))])
                   (cond [(string=? "200" (get-http-status-code response)) (let ([data (get-get-response-data response)])
-                                                                            (if (s3-delete name storage-name)
-                                                                                (uri-decode data)
+                                                                            (if (car (s3-delete name storage-name))
+                                                                                `(#t ,(uri-decode data))
                                                                                 (begin (newline)
                                                                                        (display response)
                                                                                        (newline)
-                                                                                       #f)))]
+                                                                                       `(#f . (get-http-status-code response)))))]
                         [(string=? "307" (get-http-status-code response)) (let* ([response-xexpr     (get-response-xml-xexpr response)]
                                                                                  [temporary-redirect (se-path* '(Endpoint) response-xexpr)])
                                                                             (set-url-host! url temporary-redirect)
@@ -631,20 +636,20 @@
                                                                                               (get-header-list header-hash)))])
                                                                               (if (string=? "200" (get-http-status-code response))
                                                                                   (let ([data (get-get-response-data response)])
-                                                                                    (if (s3-delete name storage-name)
-                                                                                        (uri-decode data)
+                                                                                    (if (car (s3-delete name storage-name))
+                                                                                        `(#t ,(uri-decode data))
                                                                                         (begin (newline)
                                                                                                (display response)
                                                                                                (newline)
-                                                                                               #f)))
+                                                                                               `(#f . (get-http-status-code response)))))
                                                                                   (begin (newline)
                                                                                          (display response)
                                                                                          (newline)
-                                                                                         #f))))]
+                                                                                         `(#f . (get-http-status-code response))))))]
                         [else                                             (begin (newline)
                                                                                  (display response)
                                                                                  (newline)
-                                                                                 #f)])))))
+                                                                                 `(#f . (get-http-status-code response)))])))))
 
 (define (s3-delete name storage-name)
   (let-values ([(date-stamp x-amz-date rfc-2822) (date-stamp-and-x-amz-date-and-rfc2822)])
@@ -680,7 +685,7 @@
                                  (delete-impure-port
                                   url
                                   (get-header-list header-hash)))])                  
-                  (cond [(string=? "204" (get-http-status-code response)) #t]
+                  (cond [(string=? "204" (get-http-status-code response)) `(#t . 200)]
                         [(string=? "307" (get-http-status-code response)) (let* ([response-xexpr     (get-response-xml-xexpr response)]
                                                                                  [temporary-redirect (se-path* '(Endpoint) response-xexpr)])
                                                                             (set-url-host! url temporary-redirect)
@@ -704,15 +709,15 @@
                                                                                               url
                                                                                               (get-header-list header-hash)))])
                                                                               (if (string=? "204" (get-http-status-code response))
-                                                                                  #t
+                                                                                  `(#t . 204)
                                                                                   (begin (newline)
                                                                                          (display response)
                                                                                          (newline)
-                                                                                         #f))))]
+                                                                                         `(#f . (get-http-status-code response))))))]
                         [else                                             (begin (newline)
                                                                                  (display response)
                                                                                  (newline)
-                                                                                 #f)])))))
+                                                                                 `(#f . (get-http-status-code response)))])))))
 
 ;=======================================================================================
 ;=======================================================================================
@@ -723,7 +728,7 @@
 
 (define (put-post-processing-lines-for-exposure-analysis exposure-analysis-uuid-string post-processing-lines)
   (if (s3-put exposure-analysis-uuid-string post-processing-lines "post-processing-lines-storage")
-      (if (sqs-send-message exposure-analysis-uuid-string "post-processing-lines-queue")
+      (if (car (sqs-send-message exposure-analysis-uuid-string "post-processing-lines-queue"))
           #t
           (begin
             (s3-delete exposure-analysis-uuid-string "post-processing-lines-storage")
@@ -731,17 +736,17 @@
       #f))
 
 (define (get-post-processing-lines)
-  (let ([post-processing-lines-name (sqs-receive-message "post-processing-lines-queue")])
-    (if post-processing-lines-name
-        (let ([post-processing-lines (s3-get post-processing-lines-name "post-processing-lines-storage")])
-          (if post-processing-lines
-              (cons post-processing-lines-name post-processing-lines)
+  (let ([post-processing-lines-name-result (sqs-receive-message "post-processing-lines-queue")])
+    (if (car post-processing-lines-name-result)
+        (let ([post-processing-lines-result (s3-get (cdr post-processing-lines-name-result) "post-processing-lines-storage")])
+          (if (car post-processing-lines-result)
+              (cons (cdr post-processing-lines-name-result) (cdr post-processing-lines-result))
               #f))
         #f)))
 
 (define (put-nlp-results exposure-analysis-uuid-string nlp-results)
-  (if (s3-put exposure-analysis-uuid-string nlp-results "nlp-results-storage")
-      (if (sqs-send-message exposure-analysis-uuid-string "nlp-results-queue")
+  (if (car (s3-put exposure-analysis-uuid-string nlp-results "nlp-results-storage"))
+      (if (car (sqs-send-message exposure-analysis-uuid-string "nlp-results-queue"))
           #t
         (begin
          (s3-delete exposure-analysis-uuid-string "nlp-results-storage")
@@ -749,21 +754,24 @@
     #f))
 
 (define (get-nlp-results)
-  (let ([nlp-results-name (sqs-receive-message "nlp-results-queue")])
-    (if nlp-results-name
-        (let ([nlp-results (s3-get nlp-results-name "nlp-results-storage")])
-          (if nlp-results
-              (cons nlp-results-name nlp-results)
+  (let ([nlp-results-name-result (sqs-receive-message "nlp-results-queue")])
+    (if (car nlp-results-name-result)
+        (let ([nlp-results-result (s3-get (cdr nlp-results-name-result) "nlp-results-storage")])
+          (if (car nlp-results-result)
+              (cons (cdr nlp-results-name-result) (cdr nlp-results-result))
               #f))
         #f)))
 
 (define (put-exposure-results exposure-analysis-uuid-string exposure-results)
-  (if (s3-put exposure-analysis-uuid-string exposure-results "exposure-results-storage")
+  (if (car (s3-put exposure-analysis-uuid-string exposure-results "exposure-results-storage"))
       #t
       #f))
 
 (define (get-exposure-results exposure-analysis-uuid-string)
-  (s3-get exposure-analysis-uuid-string "exposure-results-storage"))
+  (let ([exposure-results-result (s3-get exposure-analysis-uuid-string "exposure-results-storage")])
+    (if (car exposure-results-result)
+        (cdr exposure-results-result)
+        #f)))
 
 ;=======================================================================================
 ;=======================================================================================
