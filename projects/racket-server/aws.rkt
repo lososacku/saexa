@@ -721,48 +721,84 @@
 
 
 (define (put-post-processing-lines-for-exposure-analysis exposure-analysis-uuid-string post-processing-lines)
+  (with-handlers ([exn:fail? (lambda (exception)
+                                (display "CAUGHT")
+                                (newline)
+                                (display exception)
+                                (newline)
+                                #f)])
   (if (s3-put exposure-analysis-uuid-string post-processing-lines "post-processing-lines-storage")
       (if (sqs-send-message exposure-analysis-uuid-string "post-processing-lines-queue")
           #t
           (begin
             (s3-delete exposure-analysis-uuid-string "post-processing-lines-storage")
             #f))
-      #f))
+      #f)))
 
 (define (get-post-processing-lines)
+  (with-handlers ([exn:fail? (lambda (exception)
+                                (display "CAUGHT")
+                                (newline)
+                                (display exception)
+                                (newline)
+                                #f)])
   (let ([post-processing-lines-name (sqs-receive-message "post-processing-lines-queue")])
     (if post-processing-lines-name
         (let ([post-processing-lines (s3-get post-processing-lines-name "post-processing-lines-storage")])
           (if post-processing-lines
               (cons post-processing-lines-name post-processing-lines)
               #f))
-        #f)))
+        #f))))
 
 (define (put-nlp-results exposure-analysis-uuid-string nlp-results)
+  (with-handlers ([exn:fail? (lambda (exception)
+                                (display "CAUGHT")
+                                (newline)
+                                (display exception)
+                                (newline)
+                                #f)])
   (if (s3-put exposure-analysis-uuid-string nlp-results "nlp-results-storage")
       (if (sqs-send-message exposure-analysis-uuid-string "nlp-results-queue")
           #t
         (begin
          (s3-delete exposure-analysis-uuid-string "nlp-results-storage")
          #f))
-    #f))
+    #f)))
 
 (define (get-nlp-results)
+  (with-handlers ([exn:fail? (lambda (exception)
+                                (display "CAUGHT")
+                                (newline)
+                                (display exception)
+                                (newline)
+                                #f)])
   (let ([nlp-results-name (sqs-receive-message "nlp-results-queue")])
     (if nlp-results-name
         (let ([nlp-results (s3-get nlp-results-name "nlp-results-storage")])
           (if nlp-results
               (cons nlp-results-name nlp-results)
               #f))
-        #f)))
+        #f))))
 
 (define (put-exposure-results exposure-analysis-uuid-string exposure-results)
+  (with-handlers ([exn:fail? (lambda (exception)
+                                (display "CAUGHT")
+                                (newline)
+                                (display exception)
+                                (newline)
+                                #f)])
   (if (s3-put exposure-analysis-uuid-string exposure-results "exposure-results-storage")
       #t
-      #f))
+      #f)))
 
 (define (get-exposure-results exposure-analysis-uuid-string)
-  (s3-get exposure-analysis-uuid-string "exposure-results-storage"))
+  (with-handlers ([exn:fail? (lambda (exception)
+                                (display "CAUGHT")
+                                (newline)
+                                (display exception)
+                                (newline)
+                                #f)])
+  (s3-get exposure-analysis-uuid-string "exposure-results-storage")))
 
 ;=======================================================================================
 ;=======================================================================================
