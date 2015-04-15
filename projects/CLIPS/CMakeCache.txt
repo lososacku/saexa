@@ -21,7 +21,7 @@ CLIPS_BINARY_DIR:STATIC=/Users/sparrow/projects/saexa/projects/CLIPS
 CLIPS_SOURCE_DIR:STATIC=/Users/sparrow/projects/saexa/projects/CLIPS
 
 //Missing description
-CMAKE_BUILD_TYPE:STRING=Debug
+CMAKE_BUILD_TYPE:STRING=
 
 //Missing description
 CMAKE_COLOR_MAKEFILE:BOOL=ON
@@ -111,7 +111,7 @@ CMAKE_OSX_ARCHITECTURES:STRING=
 CMAKE_OSX_DEPLOYMENT_TARGET:STRING=
 
 //Missing description
-CMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk
+CMAKE_OSX_SYSROOT:STRING=
 
 //Missing description
 CMAKE_PROJECT_NAME:STATIC=CLIPS

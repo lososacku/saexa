@@ -148,6 +148,12 @@ clips.h
 base64.h
 /Users/sparrow/projects/saexa/projects/CLIPS/base64.h
 
+/Users/sparrow/projects/saexa/projects/CLIPS/base64.c
+string.h
+-
+base64.h
+/Users/sparrow/projects/saexa/projects/CLIPS/base64.h
+
 /Users/sparrow/projects/saexa/projects/CLIPS/base64.h
 
 /Users/sparrow/projects/saexa/projects/CLIPS/bload.c
