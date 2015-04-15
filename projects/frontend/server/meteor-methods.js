@@ -1,4 +1,6 @@
- Meteor.startup(function () {
+// Copyright 2015 Ryan B. Hicks
+
+Meteor.startup(function () {
 
      twitter = new TwitterApi();
 

@@ -1,3 +1,5 @@
+; Copyright 2015 Ryan B. Hicks
+
 
 (defrule SCOPE-DISCOVERABILITY::found-2-discoverable-scope
   (object

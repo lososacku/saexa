@@ -1,3 +1,5 @@
+// Copyright 2015 Ryan B. Hicks
+
 ExposureAnalysisNames = new Mongo.Collection('exposure_analysis_names');
 
 

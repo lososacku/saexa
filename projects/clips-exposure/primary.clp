@@ -1,4 +1,4 @@
-
+; Copyright 2015 Ryan B. Hicks
 
 
 (defrule PRIMARY::found-reused-login-name

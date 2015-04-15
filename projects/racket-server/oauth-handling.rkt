@@ -1,3 +1,5 @@
+;; Copyright 2015 Ryan B. Hicks
+
 #lang racket
 
 (require (planet ryanc/webapi:1:=1/oauth2))

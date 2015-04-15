@@ -1,3 +1,5 @@
+% Copyright 2015 Ryan B. Hicks
+
 :- import append/3 from basics.
 :- import ith/3 from basics.
 :- dynamic(token_type/2).

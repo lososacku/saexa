@@ -1,3 +1,5 @@
+# Copyright 2015 Ryan B. Hicks
+
 # functions common to all procurers
 
 class ProcurerBase

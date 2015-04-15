@@ -1,3 +1,5 @@
+# Copyright 2015 Ryan B. Hicks
+
 ## taken and modified from the Facebook Collections Atomosphere package
 ##
 

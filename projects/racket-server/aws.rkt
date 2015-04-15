@@ -1,3 +1,5 @@
+;; Copyright 2015 Ryan B. Hicks
+
 (module aws racket
         (provide put-post-processing-lines-for-exposure-analysis)
         (provide get-post-processing-lines)

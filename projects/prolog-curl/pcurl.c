@@ -1,3 +1,6 @@
+/* Copyright 2015 Ryan B. Hicks */
+
+
 //consult(pcurl, [cc_opts('-O2 -I/Users/sparrow/XSB/emu -I/Users/sparrow/XSB/config/i386-apple-darwin13.3.0')]).
 //consult(pcurl, [cc_opts('-O2 -I/home/ec2-user/interzone/XSB/emu -I/Users/sparrow/XSB/config/x86_64-unknown-linux-gnu')]).
 

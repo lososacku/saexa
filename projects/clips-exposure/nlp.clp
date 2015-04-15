@@ -1,3 +1,4 @@
+; Copyright 2015 Ryan B. Hicks
 
 ; add n-grams
 ; add levenshtein algorithm

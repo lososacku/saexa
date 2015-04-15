@@ -1,3 +1,5 @@
+// Copyright 2015 Ryan B. Hicks
+
 Math.radians = function(degrees) {
     return degrees * Math.PI / 180;
 };

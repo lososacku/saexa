@@ -1,3 +1,5 @@
+# Copyright 2015 Ryan B. Hicks
+
 class TwitterProcurer extends ProcurerBase
 
         constructor: (serviceName) ->

@@ -1,3 +1,5 @@
+;; Copyright 2015 Ryan B. Hicks
+
 #lang racket
 
 (require web-server/servlet

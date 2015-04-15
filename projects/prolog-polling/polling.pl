@@ -1,3 +1,4 @@
+% Copyright 2015 Ryan B. Hicks
 
 :- dynamic(analysis_uuid/1).
 

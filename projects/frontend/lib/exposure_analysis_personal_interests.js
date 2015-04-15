@@ -1,3 +1,5 @@
+// Copyright 2015 Ryan B. Hicks
+
 ExposureAnalysisPersonalInterests = new Mongo.Collection('exposure_analysis_personal_interests');
 
 

@@ -1,3 +1,5 @@
+# Copyright 2015 Ryan B. Hicks
+
 exposureIncidents = ->
         analysisUuid            = Session.get('analysisUuid')
         exposureIncidentsCursor = ExposureIncidents.find({exposure_analysis_uuid: analysisUuid})

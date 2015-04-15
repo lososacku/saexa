@@ -1,3 +1,5 @@
+// Copyright 2015 Ryan B. Hicks
+
 ServiceConfiguration.configurations.remove({
     service: "facebook"
 });

@@ -1,3 +1,5 @@
+; Copyright 2015 Ryan B. Hicks
+
 
 (defrule SECONDARY::found-intrascope-aggregated-first-and-last-name-exposure
   (object

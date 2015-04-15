@@ -1,3 +1,6 @@
+; Copyright 2015 Ryan B. Hicks
+
+
 ; depth:   simply     <connectedness>, only uni-directional
 ;          strongly   <connectedness>, at least one bi-directional
 ;          completely <connectedness>  all bi-directional

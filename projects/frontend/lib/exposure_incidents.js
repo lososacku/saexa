@@ -1,3 +1,5 @@
+// Copyright 2015 Ryan B. Hicks
+
 ExposureIncidents = new Mongo.Collection('exposure_incidents');
 
 if (Meteor.isServer) {

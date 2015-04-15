@@ -1,3 +1,4 @@
+; Copyright 2015 Ryan B. Hicks
 
 
 (defclass PRIVACY-DILUTION::PRIVACY-DOMAIN-POST (is-a USER))

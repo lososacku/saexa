@@ -1,3 +1,5 @@
+; Copyright 2015 Ryan B. Hicks
+
 (defglobal                       ?*host*          = "http://localhost:53535"
                                  ?*left-marker*   = "nlp-results-data-lines : \"")
 (defglobal PRIMARY               ?*host*          = "http://localhost:53535")

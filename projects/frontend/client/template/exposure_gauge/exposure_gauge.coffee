@@ -1,3 +1,7 @@
+# Copyright 2015 Ryan B. Hicks
+#
+# 
+
 exposureAnalysisNumericalResultsSub = Meteor.subscribe('exposure_analysis_numerical_results')
 
 Template.exposureGauge.created = ->

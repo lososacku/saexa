@@ -1,4 +1,4 @@
-
+# Copyright 2015 Ryan B. Hicks
 
 Template.exposureNames.helpers
         selector: ->

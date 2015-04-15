@@ -1,3 +1,6 @@
+; Copyright 2015 Ryan B. Hicks
+
+
 (defclass RAISE-AND-REPORT::EXPOSURE-INCIDENT-TITLE (is-a USER)
    (slot incident-title (type LEXEME)))
 

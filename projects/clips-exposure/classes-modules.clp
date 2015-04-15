@@ -1,3 +1,5 @@
+; Copyright 2015 Ryan B. Hicks
+
 (defmodule MAIN (export ?ALL))
 
 (defmodule PRIMARY (export defclass    EXPOSURE-SCOPE)

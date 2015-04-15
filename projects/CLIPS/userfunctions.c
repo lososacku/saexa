@@ -1,4 +1,6 @@
-   /*******************************************************/
+// customizations Copyright 2015 Ryan B. Hicks
+
+/*******************************************************/
    /*      "C" Language Integrated Production System      */
    /*                                                     */
    /*               CLIPS Version 6.24  04/21/06          */
