@@ -1,8 +1,8 @@
 exposureAnalysisNumericalResultsSub = Meteor.subscribe('exposure_analysis_numerical_results')
 
 Template.exposureGauge.created = ->
-#      analysisUuid = Meteor.uuid()
-        analysisUuid = "f593a6f6-60d0-4b28-b70a-779ffed9aa4d"
+        analysisUuid = Meteor.uuid()
+        console.log(analysisUuid)
         Session.set('analysisUuid', analysisUuid)
 
 

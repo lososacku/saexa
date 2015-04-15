@@ -1,5 +1,5 @@
 
 
 Template.exposureNames.helpers
-
-        selector: {exposure_analysis_uuid: Session.get('analysisUuid')}
+        selector: ->
+                {exposure_analysis_uuid: Session.get('analysisUuid')}
