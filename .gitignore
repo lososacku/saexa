@@ -6,3 +6,5 @@ CMakeCache.txt
 *.dylib
 .DS_Store
 *CMakeFiles/*
+*racket-server/compiled/*
+*CLIPS/clips
