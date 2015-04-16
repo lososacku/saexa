@@ -5,6 +5,8 @@
 CMakeCache.txt
 *.dylib
 .DS_Store
-*CMakeFiles/*
-*racket-server/compiled/*
-*CLIPS/clips
+projects/CLIPS/CMakeFiles/*
+projects/CLIPS/CMakeFiles/clips-dir/*
+projects/CLIPS/clips
+projects/racket-server/compiled/*
+
