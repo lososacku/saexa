@@ -231,12 +231,15 @@
     ;; (newline)
     ;; (display exposure-analysis-uuid-string)
     ;; (newline)
-    (let retry ()
+    (let retry ([count 0])
       (when
-        (not (put-post-processing-lines-for-exposure-analysis
-              exposure-analysis-uuid-string
-              (bytes->string/utf-8 (base64-decode (request-post-data/raw request)))))
-        (retry)))
+        (and (< count 10)
+             (not (put-post-processing-lines-for-exposure-analysis
+                   exposure-analysis-uuid-string
+                   (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))))
+        (begin
+          (sleep 2)
+          (retry (+ 1 count)))))
     (response/output
      (lambda (output)
        (write-string
@@ -250,10 +253,13 @@
   (newline)
   ;; (display (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))
   ;; (newline)
-  (let retry ()
+  (let retry ([count 0])
       (when
-        (not (process-service-details (bytes->string/utf-8 (base64-decode (request-post-data/raw request)))))
-        (retry)))        
+          (and (< count 10)
+               (not (process-service-details (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))))
+        (begin
+          (sleep)
+          (retry (+ 1 count)))))
   (response/output
    (lambda (output)
      (write-string
@@ -287,11 +293,14 @@
     (newline)
     ;; (print (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))
     ;; (newline)
-    (let retry ()
+    (let retry ([count 0])
       (when
-          (not (put-nlp-results exposure-analysis-uuid-string
-                                (bytes->string/utf-8 (base64-decode (request-post-data/raw request)))))
-        (retry)))
+          (and (< count 10)
+               (not (put-nlp-results exposure-analysis-uuid-string
+                                     (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))))
+        (begin
+          (sleep 2)
+          (retry (+ 1 count)))))
     (response/output
      (lambda (output)
        (write-string
@@ -331,10 +340,13 @@
     ;; (newline)
     (let* ([string-data (bytes->string/utf-8 (base64-decode (request-post-data/raw request)))]
            [string-port (open-input-string string-data)])
-      (let retry ()
+      (let retry ([count 0])
         (when
-            (not (process-exposure-report-lines string-port exposure-analysis-uuid-string))
-          (retry)))
+            (and (< count 10)
+                 (not (process-exposure-report-lines string-port exposure-analysis-uuid-string)))
+          (begin
+            (sleep 2)
+            (retry (+ 1 count)))))
       (close-input-port string-port))
     (purge exposure-analysis-uuid-string)
     (response/output
@@ -351,8 +363,13 @@
     ;; (newline)
     ;; (print (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))
     ;; (newline)
-    (let retry ([exposure-results (get-exposure-results exposure-analysis-uuid-string)])
-      (when (not exposure-results) (retry))
+    (let retry ([count            0]
+                [exposure-results (get-exposure-results exposure-analysis-uuid-string)])
+      (when (and (< count 10)
+                 (not exposure-results))
+            (begin
+              (sleep 2)
+              (retry (+ 1 count) exposure-results)))
     (response/output
      (lambda (output)
        (write-string
