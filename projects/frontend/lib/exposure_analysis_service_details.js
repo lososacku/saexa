@@ -1,22 +1,17 @@
 // Copyright 2015 Ryan B. Hicks
 
-//ExposureAnalysisServiceDetails = new Mongo.Collection('exposure_analysis_service_details');
+ExposureAnalysisServiceDetails = new Mongo.Collection('exposure_analysis_service_details');
 
 
 
-// TabularTables = {};
+if (Meteor.isClient) {
+    Meteor.subscribe('exposure_analysis_service_details_publish');
+}
 
-
-// Meteor.isClient && Template.registerHelper('TabularTables', TabularTables);
-
-// TabularTables.Details = new Tabular.Table({
-    
-//     name:"DetailsList",
-//     collection:ExposureAnalysisServiceDetails,
-//     columns: [
-//         {data: "value", title: "Personal Interests"}
-//     ]
-
-// });
+if (Meteor.isServer) {
+    Meteor.publish('exposure_analysis_service_details_publish', function() {
+        return ExposureAnalysisServiceDetails.find();
+    });
+}
 
 

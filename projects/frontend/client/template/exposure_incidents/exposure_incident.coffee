@@ -1,4 +1,4 @@
-# Copyright 2015 Ryan B. Hicks        
+# Copyright 2015 Ryan B. Hicks
 
 
 Template.exposureIncident.helpers
