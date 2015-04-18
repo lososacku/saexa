@@ -1,3 +1,5 @@
+# Copyright 2015 Ryan B. Hicks
+
 # login
 
 Template.login.events(
