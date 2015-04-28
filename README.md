@@ -23,6 +23,29 @@ Mongdodb
 - create a db called 'meteor'
 Meteor:
 - install from meteor.com
+- install the following packages with 'meteor add'
+        - crypto-base
+        - crypto-base64
+        - twitter-api
+        - accounts-base
+        - service-configuration
+        - http
+        - facebook-procurer
+        - procurer-base
+        - accounts-facebook
+        - accounts-twitter
+        - coffeescript
+        - twitter-procurer
+        - tumblr-procurer
+        - youtube-procurer
+        - accounts-google
+        - mrt:accounts-instagram-6
+        - instagram-procurer
+        - richsilv:owl-carousel
+        - mizzao:bootstrap-3
+        - aldeed:tabular
+        - reywood:publish-composite
+        - pahans:inline-help
 - before meteor is launched, the following needs to be exported:
 	- MONGO\_URL=mongodb://localhost:27017/meteor
 	- (if this doesn't exist, it will run with a meteor-local instance and won't work)
