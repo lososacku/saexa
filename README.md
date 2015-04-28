@@ -8,8 +8,10 @@ CLIPS:
 - building:
 	- run 'cmake CMakeLists.txt'
 	- make
+
 Scheme:
 - install from DrRacket from racket-lang.org
+
 Prolog:
 - install XSB from http://xsb.sourceforge.net
 - build the pcurl extension (this part is a bit ugly)
@@ -18,9 +20,11 @@ Prolog:
 
 	- this needs to be changed to work with the local XSB paths. Just launch xsb and issue the command, it should compile and produce the extension
 	- N.B. XSB is a extraordinarily finicky about where it is and how it's launched. The upshot is that on \*nix systems a symlink won't work. It's necessary to use the entire path each time.
+
 Mongdodb
 - install from mongodb.org
 - create a db called 'meteor'
+
 Meteor:
 - install from meteor.com
 - install the following packages with 'meteor add'
@@ -46,6 +50,7 @@ Meteor:
 	- aldeed:tabular
 	- reywood:publish-composite
 	- pahans:inline-help
+
 - before meteor is launched, the following needs to be exported:
 	- MONGO\_URL=mongodb://localhost:27017/meteor
 	- (if this doesn't exist, it will run with a meteor-local instance and won't work)
