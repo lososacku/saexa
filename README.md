@@ -10,6 +10,8 @@ CLIPS:
 	- make
 Scheme:
 - install from DrRacket from racket-lang.org
+	- run 'raco pkg install mongodb'
+
 Prolog:
 - install XSB from http://xsb.sourceforge.net
 - build the pcurl extension (this part is a bit ugly)
