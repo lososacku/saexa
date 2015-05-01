@@ -7,6 +7,7 @@
 
 
 
+#include "curl/curl.h"
 
 #include "xsb_config.h"
 
@@ -15,9 +16,10 @@
 #include <stdlib.h>
 #include <math.h>
 
+#ifdef _WIN32
+#define snprintf _snprintf
+#endif
 
-#include "/Users/sparrow/src/curl-7.37.0/include/curl/curl.h"
-//#include "/usr/include/curl/curl.h"
 
 
 #ifdef WIN_NT
