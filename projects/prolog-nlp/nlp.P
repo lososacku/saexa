@@ -1,7 +1,7 @@
 % Copyright 2015 Ryan B. Hicks
 
 :- import append/3 from basics.
-:- import ith/3 from basics.
+:- import ith/3, subseq/3 from basics.
 :- dynamic(token_type/2).
 :- dynamic(user_item/5).
 
@@ -35,7 +35,7 @@
           kt2/0,
           kt3/0,
           xt0/0,
-          make_nlp_classification/2,
+          make_nlp_classification/3,
           tld/3,
           scheme_name/3,
           colon_slash_slash/3,
@@ -56,6 +56,7 @@
           punctuation_string/3,
           token/3,
           tokenize_string/3,
+          flatten_string_list/2,
           add_token_type/2,
           purge_token_types/0,
           flatten_tokens/2,
@@ -75,9 +76,10 @@
           post_contains_url/3,
           post_contains_email_address/3,
           high_school_found/3,
-          home_town_found/3.
+          home_town_found/3,
+          url_post_contains_youtube_video_id/2.
 
-%% :- local  make_nlp_classification/2,
+%% :- local  make_nlp_classification/3,
 %%           tld/3,
 %%           scheme_name/3,
 %%           colon_slash_slash/3,
@@ -98,6 +100,8 @@
 %%           punctuation_string/3,
 %%           token/3,
 %%           tokenize_string/3,
+%%           flatten_string_list/2,
+%%           lower_string_list/2,
 %%           add_token_type/2,
 %%           purge_token_types/0,
 %%           flatten_tokens/2,
@@ -117,7 +121,8 @@
 %%           post_contains_url/3,
 %%           post_contains_email_address/3,
 %%           high_school_found/3,
-%%           home_town_found/3.
+%%           home_town_found/3,
+%%           url_post_contains_youtube_video_id/2.
 
 %%-----------------------------------------------------------------
 
@@ -148,7 +153,12 @@
           add_profile_login_name/2,
           add_profile_user_id/2,
           process_post/2,
+          tokenize_string/3,
+          flatten_string_list/2,
+          lower_string_list/2,
           purge_nlp_data/0.
+
+
 
 
 %%^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -172,7 +182,7 @@ store_nlp_result(PostId,
     %% name(Taxonomy_name,Taxonomy),
     %% name(Entity_name,Entity),
     %% name(Item_name,Item),
-    %% write('||||||||||||||'),nl,write(Item_name),nl,write(Item),nl,
+    %% write('||||||||||||||'),nl,write(PostId),nl,write(Item_name),nl,write(Classification_name),nl,nl,
     nlp_result(CurrentClipsNlpResultStrings),
     retract(nlp_result(_)),
     fmt_write_string(ClipsNlpResultStrings,
@@ -433,16 +443,17 @@ process_post(Id,ExposureString)
 %% nl,
 %% write(Id),
 %% nl,
-%% write(ExposureString),
+%% name(ExposureString_name,ExposureString),write(ExposureString_name),
+%% nl,
 %% nl,
 tokenize_string(ESt,ExposureString,_),
 %% write(ESt),
 %% nl,
-make_nlp_classification(Id,ESt),
+make_nlp_classification(Id,ExposureString,ESt),
 purge_token_types.
 
 
-make_nlp_classification(PostId,PostTokens)
+make_nlp_classification(PostId,ExposureString,PostTokens)
 :-
 
 ignore(school_found(PostId,PostTokens,_)),
@@ -460,7 +471,7 @@ ignore(first_name_found(PostId,PostTokens,_)),
 ignore(middle_name_found(PostId,PostTokens,_)),
 ignore(last_name_found(PostId,PostTokens,_)),
 ignore(catalogued_constituent_found(PostId,PostTokens,_)),
-ignore(post_contains_url(PostId,PostTokens,_)),
+ignore(post_contains_url(PostId,ExposureString,PostTokens,_)),
 ignore(post_contains_email_address(PostId,PostTokens,_)).
 
 
@@ -687,7 +698,7 @@ any_token,!,
 
 %---------------------------------------------------
 
-post_contains_url(PostId)
+post_contains_url(PostId,ExposureString)
 -->
 {tokenize_string(Heuristic,"heuristic",_),
  tokenize_string(Url,"url",_)},!,
@@ -698,7 +709,8 @@ any_token,!,
             "url-found",
             Heuristic,
             Url,
-            U)}.
+            U),
+url_post_contains_youtube_video_id(PostId,ExposureString)}.
 
 post_contains_email_address(PostId)
 -->
@@ -712,6 +724,39 @@ any_token,!,
             Heuristic,
             EmailAddress,
             EA)}.
+
+%---------------------------------------------------
+
+
+
+url_post_contains_youtube_video_id(PostId,ExposureString)
+:-
+%% write('#################'),
+%% nl,
+tokenize_string(VideoId,"youtube-video-id",_),!,
+user_item(Taxonomy,VideoId,Item,_,_),
+flatten_string_list(Item,ItemString),
+lower_string_list(ExposureString,ExposureStringLower),
+%% write('$$$$$$$$$$$$$$$$$'),
+%% nl,
+%% name(ExposureStringLower_name,ExposureStringLower),
+%% write(ExposureStringLower_name),
+%% nl,tokenize_string(
+%% name(ItemString_name,ItemString),
+%% write(ItemString_name),
+%% nl,
+%% nl,
+%% nl,
+subseq(ExposureStringLower,ItemString,_),
+%% write('-----------------'),
+%% nl,
+%% nl,
+%% nl,
+nlp_result(PostId,
+            "youtube-video-id-found",
+            Taxonomy,
+            VideoId,
+            Item).
 
 
 
@@ -1380,6 +1425,16 @@ flatten_tokens([],[]).
 %////////////////////////////////////////////////////////////////////
 % utilities
 %////////////////////////////////////////////////////////////////////
+
+flatten_string_list([SLh|SLt],SL) :- flatten_string_list(SLt,SL0),
+                                     append(SLh,SL0,SL).
+flatten_string_list([],[]).
+
+lower_string_list([SLh|SLt],SL) :- lower_string_list(SLt,SL0),
+                                   to_lower(SLh,SLL),
+                                   append([SLL],SL0,SL).
+lower_string_list([],[]).
+
 
 ignore(Goal) :- Goal, !.
 ignore(_).
