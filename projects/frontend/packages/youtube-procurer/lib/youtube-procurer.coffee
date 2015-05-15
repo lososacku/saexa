@@ -38,32 +38,34 @@ class YoutubeProcurer extends ProcurerBase
                         channelName = activitiesObject['snippet']['title']
                         channelId   = activitiesObject['id']
 
-                        clipsDisplayLineString      = "'(clips . #{@OQ}(make-instance of POSTED-DATA-ITEM(uuid #{displayUuid})(service-name #{@IQ}youtube#{@IQ})(account-name #{@IQ}#{channelName}#{@IQ})(raw-url #{@IQ}https://www.youtube.com/channel/#{@sanitize(decodeURIComponent(channelId))}#{@IQ})(raw-post #{@IQ}#{@sanitize(channelName)}#{@IQ}))#{@OQ})"
-                        clipsIdLineString           = "'(clips . #{@OQ}(make-instance of POSTED-DATA-ITEM(uuid #{idUuid})(service-name #{@IQ}youtube#{@IQ})(account-name #{@IQ}#{channelId}#{@IQ})(raw-url #{@IQ}https://www.youtube.com/channel/#{@sanitize(decodeURIComponent(channelId))}#{@IQ})(raw-post #{@IQ}#{@sanitize(channelId)}#{@IQ}))#{@OQ})"
-                        prologDisplayLineString     = "'(prolog . #{@OQ}add_profile_display_name(#{@IQ}youtube#{@IQ},#{@IQ}#{@sanitize(channelName)}#{@IQ})#{@OQ})"
-                        prologIdLineString          = "'(prolog . #{@OQ}add_profile_user_id(#{@IQ}youtube#{@IQ},#{@IQ}#{@sanitize(channelId)}#{@IQ})#{@OQ})"
-                        prologDisplayPostLineString = "'(prolog . #{@OQ}process_post('#{displayUuid}',#{@IQ}#{@sanitize(channelName)}#{@IQ})#{@OQ})"
-                        prologIdPostLineString      = "'(prolog . #{@OQ}process_post('#{idUuid}',#{@IQ}#{@sanitize(channelId)}#{@IQ})#{@OQ})"
+                        if channelName is not ""
 
-                        @addPostProcessingClipsLine(clipsDisplayLineString)
-                        @addPostProcessingClipsLine(clipsIdLineString)
-                        @addPostProcessingPrologProfileDisplayLine(prologDisplayLineString)
-                        @addPostProcessingPrologProfileUserIdLine(prologIdLineString)
-                        @addPostProcessingPrologProcessPostLine(prologDisplayPostLineString)
-                        @addPostProcessingPrologProcessPostLine(prologIdPostLineString)
+                                clipsDisplayLineString      = "'(clips . #{@OQ}(make-instance of POSTED-DATA-ITEM(uuid #{displayUuid})(service-name #{@IQ}youtube#{@IQ})(account-name #{@IQ}#{channelName}#{@IQ})(raw-url #{@IQ}https://www.youtube.com/channel/#{@sanitize(decodeURIComponent(channelId))}#{@IQ})(raw-post #{@IQ}#{@sanitize(channelName)}#{@IQ}))#{@OQ})"
+                                clipsIdLineString           = "'(clips . #{@OQ}(make-instance of POSTED-DATA-ITEM(uuid #{idUuid})(service-name #{@IQ}youtube#{@IQ})(account-name #{@IQ}#{channelId}#{@IQ})(raw-url #{@IQ}https://www.youtube.com/channel/#{@sanitize(decodeURIComponent(channelId))}#{@IQ})(raw-post #{@IQ}#{@sanitize(channelId)}#{@IQ}))#{@OQ})"
+                                prologDisplayLineString     = "'(prolog . #{@OQ}add_profile_display_name(#{@IQ}youtube#{@IQ},#{@IQ}#{@sanitize(channelName)}#{@IQ})#{@OQ})"
+                                prologIdLineString          = "'(prolog . #{@OQ}add_profile_user_id(#{@IQ}youtube#{@IQ},#{@IQ}#{@sanitize(channelId)}#{@IQ})#{@OQ})"
+                                prologDisplayPostLineString = "'(prolog . #{@OQ}process_post('#{displayUuid}',#{@IQ}#{@sanitize(channelName)}#{@IQ})#{@OQ})"
+                                prologIdPostLineString      = "'(prolog . #{@OQ}process_post('#{idUuid}',#{@IQ}#{@sanitize(channelId)}#{@IQ})#{@OQ})"
+
+                                @addPostProcessingClipsLine(clipsDisplayLineString)
+                                @addPostProcessingClipsLine(clipsIdLineString)
+                                @addPostProcessingPrologProfileDisplayLine(prologDisplayLineString)
+                                @addPostProcessingPrologProfileUserIdLine(prologIdLineString)
+                                @addPostProcessingPrologProcessPostLine(prologDisplayPostLineString)
+                                @addPostProcessingPrologProcessPostLine(prologIdPostLineString)
                         
 
-                        #
-                        @debugLog(clipsDisplayLineString)
-                        @debugLog(clipsIdLineString)
-                        @debugLog(prologDisplayLineString)
-                        @debugLog(prologIdLineString)
-                        @debugLog(prologDisplayPostLineString)
-                        @debugLog(prologIdPostLineString)
-                        #
+                                #
+                                @debugLog(clipsDisplayLineString)
+                                @debugLog(clipsIdLineString)
+                                @debugLog(prologDisplayLineString)
+                                @debugLog(prologIdLineString)
+                                @debugLog(prologDisplayPostLineString)
+                                @debugLog(prologIdPostLineString)
+                                #
 
-                        @addServiceDetail("channel-name", channelName)
-                        @channelCount += 1
+                                @addServiceDetail("channel-name", channelName)
+                                @channelCount += 1
                                                 
                 @internalProcure(urlWithBaseQuery, urlWithBaseQuery, authorizationString, processor)
                 
