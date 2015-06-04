@@ -50,7 +50,7 @@
 (defrule PRIMARY::found-facebook-email-address-exposure
   (object
    (is-a NLP-CLASSIFICATION)
-   (classification catalogued-email-address-found)
+   (classification email-address-found)
    (target-uuid    ?target-uuid)
    (taxonomy       "facebook")
    (item           ?item))
