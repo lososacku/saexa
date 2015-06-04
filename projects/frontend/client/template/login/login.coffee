@@ -35,7 +35,7 @@ Template.login.events(
                                         Meteor.call("storeTwitterAuthenticationInformation"))
         'click #youtubeLogin'  : ->
                 Meteor.loginWithGoogle(
-                        requestPermissions : ['https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube']
+                         requestPermissions : ['https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtube.readonly']
                         , (err) ->
                                 if err
                                         console.log("error with login with youtube " + err)
