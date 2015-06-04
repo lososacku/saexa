@@ -18,10 +18,6 @@
 
 :- export process_line/1.
 
-decrement(X, Y) :- is(Y, (X - 1)).
-%trim_to_last_index(X, Y) :- is(Y, (X - 2)).
-trim_to_last_index(X, Y) :- is(Y, (X - 25)).
-
 poll :- write('...polling...'),
         nl,
         get_post_lines(PostLinesResponse),
@@ -37,8 +33,6 @@ get_post_processing_lines(PostLinesResponse, PostProcessingLines)
 :-
 str_match('post-processing-lines : "', PostLinesResponse, forw, _, FirstIndex),
 str_match('\n"}', PostLinesResponse, rev, LastIndex, _),
-%str_match('\n"}', PostLinesResponse, rev, TrimStart, TrimEnd),
-%trim_to_last_index(TrimStart, LastIndex),
 substring(PostLinesResponse, FirstIndex, LastIndex, PostProcessingLines).
 
 get_post_processing_lines_name(PostLinesResponse, PostProcessingLinesName)

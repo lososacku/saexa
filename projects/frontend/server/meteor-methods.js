@@ -159,6 +159,8 @@ Meteor.methods({
         allServiceDetailsLines += youtubeProcurer.getServiceDetails();
         allServiceDetailsLines += instagramProcurer.getServiceDetails();
 
+//        console.log(allPostProcessingLines)
+
         encodedAllPostProcessingLines = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(allPostProcessingLines));
         encodedAllServiceDetailsLines = CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(allServiceDetailsLines));
 

@@ -291,6 +291,7 @@
 (define (put-nlp-results-handler request exposure-analysis-uuid-string)
     (print "put-nlp-results called")
     (newline)
+    ;; (newline)
     ;; (print (bytes->string/utf-8 (base64-decode (request-post-data/raw request))))
     ;; (newline)
     (let retry ([count 0])
@@ -392,7 +393,11 @@
     (newline)
     ;; (display (request-post-data/raw request))
     ;; (newline)
+    ;; (newline)    
     ;; (display (uri-decode (bytes->string/utf-8 (request-post-data/raw request))))
+    ;; (newline)
+    ;; (newline)
+    ;; (display (unescape-prolog-quotes (uri-decode (bytes->string/utf-8 (request-post-data/raw request)))))
     ;; (newline)
     (response/output
      (lambda (output)
@@ -400,6 +405,11 @@
         (let* ([post-data-string-port    (open-input-string (unescape-prolog-quotes (uri-decode (bytes->string/utf-8 (request-post-data/raw request)))))]
                [extracted-prolog-actions (group-actions 'prolog (extract-actions post-data-string-port))])
           (close-input-port post-data-string-port)
+          
+          ;; (newline)
+          ;; (display extracted-prolog-actions)
+          ;; (newline)
+          
           extracted-prolog-actions)
         output)
        (void))))
