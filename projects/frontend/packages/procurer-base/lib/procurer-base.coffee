@@ -77,8 +77,7 @@ class ProcurerBase
                 postString = postString.replace(/\,/g, "-----comma-----")
                 postString = postString.replace(/\n/g, "-----newline-----")
                 postString = postString.replace(/’/g, "-----right-single-quote-----")
-                postString = postString.replace(/\t/g, " ") # replace tabes with a space
-                postString = postString.replace(/\W/g, "")  # strip UTF-8 byte order mark
+                postString = postString.replace("\ufeff", "")
                 
                 postString
 
