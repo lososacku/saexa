@@ -54,17 +54,17 @@ Meteor:
 
 Firing it up:
 - launch racket first (prolog and clips depend on it)
-	- run saexa/projects/racket-server/server.rkt
-- launch clips (from saexa/projects/clips-polling)
+	- run chinalake/projects/racket-server/server.rkt
+- launch clips (from chinalake/projects/clips-polling)
 	- ../CLIPS/clips
 	- (load "../clips-exposure/classes-modules.clp")
 	- (load "polling.clp")
 	- (reset)
 	- (run)
-- launch prolog (from saexa/projects/prolog-polling)
+- launch prolog (from chinalake/projects/prolog-polling)
 	- \<path to\>/XSB/config/\<local dir\>/bin/xsb
 	- [polling].
-- launch meteor (from saexa/projects/frontend)
+- launch meteor (from chinalake/projects/frontend)
 	- meteor
 
 And bang away...
