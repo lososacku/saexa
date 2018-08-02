@@ -73,18 +73,6 @@
 
 ;https://graph.facebook.com/oauth/access_token?client_id=357471567663746&redirect_uri=https%3A%2F%2Fwww.facebook.com%2Fconnect%2Flogin_success.html&client_secret=de4ed6fc783b0a81e5e7c2c16bfd8cbd&code=AQD_fyd8grXZuI4NdMnujM1jTY-B7L0FJPW9w97PJUY-EBsqnJCYg6NVvFGpDEMhvKZ6lR0OBbmKRkBuTTc4FGr-y-rUcigQK6fZK-ZL6gV7c_pncGk2ipD_-FsGOP4VoczPUplyhfT-hSKRbAfgynSbkUaXRxXglPfacXXq1rDd-1uIYs0aPp1lu6TaTVDLbtTsuTGiwRK8bi4LdISKyfeFIIrQRycGlpZsIPvW8AN3Xp_9m9avz8Au29S3CuWfUJYsAjIrFoQFWnfBcsMlP65260o_uDDkjRiG919qBlnTxSDHruAkfyru_m_azhmeE-gYlZ6Rz8eMy-aOJjDn_fxk
 
-;twitter app key: robPOVzA5hrAPgvIL84u3Z3PA
-
-; temp twitter app id: vBE6mRwKPKawrjgwlq5Zttakg
-; temp twitter secret: AS23QXrXcErknzwM2qIi9ZHKnDO1ymT16lc0hapoEOa5MV2s5T
-
-; actual twitter app id:     BcpGCZhC2HljMbNqsap4cg
-; actual twitter app secret: 2cg3ccCL2GyPbPiwfUfm0TPTdZQ5AmK3NRWBiA3k0
-
-;vBE6mRwKPKawrjgwlq5Zttakg:AS23QXrXcErknzwM2qIi9ZHKnDO1ymT16lc0hapoEOa5MV2s5T
-
-;fb app id:     357471567663746
-;fb app secret: de4ed6fc783b0a81e5e7c2c16bfd8cbd
 
 ;https://www.facebook.com/connect/login_success.html?code=AQA5lC9wIbkzFZBCqne0ujwZ8CkPR_CThqrjlX4vw6Qc86523x9JaAAuzBtipoLPJ6RYuR9u7Gfk0TrMRQahsUXw-G2zht2UWH3qYl4A_PHwrRaNj5FsMV72bOIRavfYz1WIxm21M0Wm0EzOS-BrSsvluNLDSt7IUMuJurKcpj0IG9MH2W4B7v0xZp4MKb0ToMzhw7AkP9C5bClKTvivTxt6FWgNOKiA8V9KdxqcFD-dy1j4xgpmaPfV1YH5KtGmus4yzxidoaEAPb3w0-eAA9ZFoWqhw1vKeOGUZoYzo9C1XbpkzHFxDEZB6vWA3an_ZXzsrcU2PnQDNx9458Yvrsh-#_=_
 
