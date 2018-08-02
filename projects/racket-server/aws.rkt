@@ -68,9 +68,6 @@
 (define (account-number)    "321180246337")
 (define (region)            "us-west-2")
 
-;; (define (access-key) "AKIAIOSFODNN7EXAMPLE")
-;; (define (secret-key) "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY")
-
 (define (get-http-status-code response)
   (car (regexp-match* #px"HTTP/1.1[[:space:]]*([[:digit:]]{3})" response #:match-select cadr)))
 
