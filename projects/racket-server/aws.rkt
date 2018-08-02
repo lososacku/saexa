@@ -56,8 +56,6 @@
 ;=======================================================================================
 ;; internal functions
 
-(define (access-key)        "AKIAINPG4U32H5JDUQWQ")
-(define (secret-key)        "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")
 (define (expires)           (let ([now (seconds->date (current-seconds) #f)])
                               (format "~a-~a-~aT~a:~a:~aZ"
                                       (date-year now)
