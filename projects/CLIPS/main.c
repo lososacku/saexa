@@ -41,14 +41,14 @@
 /*                                                                         */
 /***************************************************************************/
 
+#include "curl/curl.h"
+
 #include <stdio.h>
 #include "setup.h"
 #include "sysdep.h"
 #include "envrnmnt.h"
 #include "extnfunc.h"
 #include "commline.h"
-
-#include "/Users/sparrow/src/curl-7.37.0/include/curl/curl.h"
 
 
 int main(int,char *[]);

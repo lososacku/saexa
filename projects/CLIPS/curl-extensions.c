@@ -1,12 +1,17 @@
 // Copyright 2015 Ryan B. Hicks
 
+#include "curl/curl.h"
 
-
-
+#ifndef _WIN32
 #include <stdlib.h>
+#else
+#include <stdio.h>
+#define snprintf _snprintf
+#endif
+
 #include "clips.h"
 
-#include "/Users/sparrow/src/curl-7.37.0/include/curl/curl.h"
+
 
 
 //^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
